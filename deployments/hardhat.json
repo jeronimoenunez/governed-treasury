@@ -1,0 +1,17 @@
+{
+  "network": "hardhat",
+  "chainId": 31337,
+  "deployedAt": "2026-10-26T10:40:10.678Z",
+  "contracts": {
+    "MockToken": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "GovernanceTimelock": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+    "GovernedTreasury": "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"
+  },
+  "roles": {
+    "operator": "0xd99a6E8C4488A1d6c2797ff198C6cEbbCc183F73",
+    "approver": "0x964B3445694716F0F1e32BaeC4eD744E754939Ef",
+    "guardian": "0x0221E34F2FC64148c9C3b947138e83fB6d11E229",
+    "proposer": "0x1540DF9B69e5814cb34312E1f89B777EBda23f9C",
+    "beneficiary": "0x834f0EF0BDd9041125A245865989DeBced4ddEFc"
+  }
+}

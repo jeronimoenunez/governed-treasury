@@ -1,0 +1,68 @@
+[
+  {
+    "paso": "Operador: retiro directo de 100",
+    "resultado": "ejecutada",
+    "hash": "0x83dc2a9b4338a67e62e89467f11b0e43e1486fe14de6c07ce97e000ced9a188d",
+    "link": "https://sepolia.etherscan.io/tx/0x83dc2a9b4338a67e62e89467f11b0e43e1486fe14de6c07ce97e000ced9a188d"
+  },
+  {
+    "paso": "Operador: pide retiro de 600 (exige doble firma)",
+    "resultado": "ejecutada",
+    "hash": "0x6d96e7b490f02416e7763d7ceb54a3df8a8997168b378c98096d29ec60054e5a",
+    "link": "https://sepolia.etherscan.io/tx/0x6d96e7b490f02416e7763d7ceb54a3df8a8997168b378c98096d29ec60054e5a"
+  },
+  {
+    "paso": "Aprobador: aprueba el pedido",
+    "resultado": "ejecutada",
+    "hash": "0xc9cb15ff0197dbaca4b9708b570abfa5cf220e76d5a930896cb4f63a1d32dd31",
+    "link": "https://sepolia.etherscan.io/tx/0xc9cb15ff0197dbaca4b9708b570abfa5cf220e76d5a930896cb4f63a1d32dd31"
+  },
+  {
+    "paso": "Operador: pide retiro de 700",
+    "resultado": "ejecutada",
+    "hash": "0x47a729b853d8fff5d2ae9f10b764938bd14b969dbef0b10cea0eb7690956a62b",
+    "link": "https://sepolia.etherscan.io/tx/0x47a729b853d8fff5d2ae9f10b764938bd14b969dbef0b10cea0eb7690956a62b"
+  },
+  {
+    "paso": "Guardián: rechaza el pedido de 700",
+    "resultado": "ejecutada",
+    "hash": "0x0d9ac5e6f5e00e899066e421b351a304c16859bd3c059147344ef55920c72f41",
+    "link": "https://sepolia.etherscan.io/tx/0x0d9ac5e6f5e00e899066e421b351a304c16859bd3c059147344ef55920c72f41"
+  },
+  {
+    "paso": "Cuenta sin rol intenta retirar",
+    "resultado": "rechazada",
+    "hash": "0xc2e40f022ff6a1324eddcaf0642f51e159a41f514970de569453ca4425e20b22",
+    "link": "https://sepolia.etherscan.io/tx/0xc2e40f022ff6a1324eddcaf0642f51e159a41f514970de569453ca4425e20b22"
+  },
+  {
+    "paso": "Operador intenta enviar a una dirección fuera de la allowlist",
+    "resultado": "rechazada",
+    "hash": "0x76ca3646c202fa1f5cb36a77d9349b86aa9d1c2e402ea6bfa80c9249bf66c47c",
+    "link": "https://sepolia.etherscan.io/tx/0x76ca3646c202fa1f5cb36a77d9349b86aa9d1c2e402ea6bfa80c9249bf66c47c"
+  },
+  {
+    "paso": "Operador intenta aprobar (no tiene el rol)",
+    "resultado": "rechazada",
+    "hash": "0x256671d10657a299f841d484247e6228799ecda5637595f3a94485b7d41cf4c6",
+    "link": "https://sepolia.etherscan.io/tx/0x256671d10657a299f841d484247e6228799ecda5637595f3a94485b7d41cf4c6"
+  },
+  {
+    "paso": "Proponente: programa agregar un beneficiario sospechoso",
+    "resultado": "ejecutada",
+    "hash": "0x24a2363868edfb9a3ec045cb3a7bf752c4aac0c3abfd0c089985bb466e77a5b1",
+    "link": "https://sepolia.etherscan.io/tx/0x24a2363868edfb9a3ec045cb3a7bf752c4aac0c3abfd0c089985bb466e77a5b1"
+  },
+  {
+    "paso": "Proponente: intenta ejecutarlo ya (faltan 72 h)",
+    "resultado": "rechazada",
+    "hash": "0xff5851a3a9bef54068ff4e478ab59714b3a096b85a9ae8105971bcc233810265",
+    "link": "https://sepolia.etherscan.io/tx/0xff5851a3a9bef54068ff4e478ab59714b3a096b85a9ae8105971bcc233810265"
+  },
+  {
+    "paso": "Guardián: cancela la operación sospechosa",
+    "resultado": "ejecutada",
+    "hash": "0x09bd764b1313ccec881d6559668b30af22f8ef5b749fb454ca09dce55838ec71",
+    "link": "https://sepolia.etherscan.io/tx/0x09bd764b1313ccec881d6559668b30af22f8ef5b749fb454ca09dce55838ec71"
+  }
+]

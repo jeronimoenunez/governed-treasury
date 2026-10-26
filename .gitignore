@@ -5,3 +5,5 @@ artifacts
 coverage
 coverage.json
 typechain-types
+out-forge
+cache-forge

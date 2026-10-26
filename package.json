@@ -5,19 +5,24 @@
   "main": "hardhat.config.js",
   "directories": {
     "test": "test"
-  },  
+  },
   "scripts": {
-      "compile": "hardhat compile",
-      "test": "hardhat test",
-      "test:gas": "REPORT_GAS=true hardhat test",
-      "coverage": "hardhat coverage"
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "test:gas": "REPORT_GAS=true hardhat test",
+    "coverage": "hardhat coverage",
+    "fuzz": "forge test --use ~/Library/Caches/hardhat-nodejs/compilers-v2/macosx-amd64/solc-macosx-amd64-v0.8.24+commit.e11b9ed9 --offline",
+    "slither": "slither . --compile-force-framework hardhat --filter-paths \"node_modules|mocks|test-foundry\"",
+    "monitor": "node scripts/monitor.js sepolia"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@foundry-rs/forge": "^1.7.1",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "dotenv": "^18.0.9",
+    "forge-std": "github:foundry-rs/forge-std#v1.9.7",
     "hardhat": "^2.29.1"
   },
   "dependencies": {

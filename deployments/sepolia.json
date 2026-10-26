@@ -1,0 +1,17 @@
+{
+  "network": "sepolia",
+  "chainId": 11155111,
+  "deployedAt": "2026-10-26T10:57:28.050Z",
+  "contracts": {
+    "MockToken": "0xdcfAbd6314830a939e522E76130414E0109C4091",
+    "GovernanceTimelock": "0xFc5D49450BAfBC894D19d40ed43f73B271566Ce9",
+    "GovernedTreasury": "0x027EB81f2cb5686707fF0dF75b9013661F058aD0"
+  },
+  "roles": {
+    "operator": "0xd99a6E8C4488A1d6c2797ff198C6cEbbCc183F73",
+    "approver": "0x964B3445694716F0F1e32BaeC4eD744E754939Ef",
+    "guardian": "0x0221E34F2FC64148c9C3b947138e83fB6d11E229",
+    "proposer": "0x1540DF9B69e5814cb34312E1f89B777EBda23f9C",
+    "beneficiary": "0x834f0EF0BDd9041125A245865989DeBced4ddEFc"
+  }
+}
