@@ -1,5 +1,5 @@
 $ npm run fuzz
-# 2026-10-27 13:16 UTC · node v22.23.4
+# 2026-10-27 15:00 UTC · node v22.23.4 · HEAD 2117e2e + cambios sin commitear de la spec 008
 
 
 > governed-treasury@1.0.0 fuzz
@@ -7,12 +7,36 @@ $ npm run fuzz
 
 No files changed, compilation skipped
 
+Ran 1 test for test-foundry/poc/GT01_GuardianCongela.t.sol:PoC_GT01_GuardianCongela
+[PASS] test_PoC_GT01_GuardianCancelaCadaUnpause() (gas: 390808)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 8.65ms (739.50µs CPU time)
+
+Ran 1 test for test-foundry/poc/GT04_TokenConComision.t.sol:PoC_GT04_TokenConComision
+[PASS] test_PoC_GT04_DepositedNoCoincideConLoRecibido() (gas: 2144585)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 8.71ms (803.04µs CPU time)
+
+Ran 1 test for test-foundry/poc/GT05_BordeVencimiento.t.sol:PoC_GT05_BordeVencimiento
+[PASS] test_PoC_GT05_SeApruebaEnElSegundoExactoDelVencimiento() (gas: 219713)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 8.47ms (562.71µs CPU time)
+
+Ran 1 test for test-foundry/poc/PocSetup.t.sol:PocSetupTest
+[PASS] test_PocBase_ReplicaElDeploy() (gas: 79177)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 8.31ms (399.88µs CPU time)
+
+Ran 1 test for test-foundry/poc/GT03_Medianoche.t.sol:PoC_GT03_Medianoche
+[PASS] test_PoC_GT03_SeisMilEnDosMinutosCruzandoMedianoche() (gas: 500380)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 8.35ms (433.75µs CPU time)
+
+Ran 1 test for test-foundry/poc/GT02_ProponenteVacia.t.sol:PoC_GT02_ProponenteVacia
+[PASS] test_PoC_GT02_ProponenteSinVigilanciaVaciaLaBoveda() (gas: 344774)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 8.33ms (429.08µs CPU time)
+
 Ran 4 tests for test-foundry/GovernedTreasury.fuzz.t.sol:GovernedTreasuryFuzzTest
-[PASS] testFuzz_DestinoNoAgendadoSiempreRechazado(address,uint256) (runs: 1000, μ: 29671, ~: 29889)
-[PASS] testFuzz_FraccionarNoSuperaElTopeDirecto(uint256[12]) (runs: 1000, μ: 198177, ~: 198253)
-[PASS] testFuzz_PedidoRespetaUmbralYLimite(uint256) (runs: 1000, μ: 32457, ~: 26951)
-[PASS] testFuzz_SinRolNoSePuedeRetirar(address,uint256) (runs: 1000, μ: 19924, ~: 20142)
-Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 49.40ms (141.29ms CPU time)
+[PASS] testFuzz_DestinoNoAgendadoSiempreRechazado(address,uint256) (runs: 1000, μ: 29660, ~: 29601)
+[PASS] testFuzz_FraccionarNoSuperaElTopeDirecto(uint256[12]) (runs: 1000, μ: 198800, ~: 199053)
+[PASS] testFuzz_PedidoRespetaUmbralYLimite(uint256) (runs: 1000, μ: 33053, ~: 26267)
+[PASS] testFuzz_SinRolNoSePuedeRetirar(address,uint256) (runs: 1000, μ: 19913, ~: 19854)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 45.50ms (127.41ms CPU time)
 
 Ran 4 tests for test-foundry/GovernedTreasury.invariant.t.sol:GovernedTreasuryInvariantTest
 [PASS] invariant_ConservacionDeFondos() (runs: 256, calls: 12800, reverts: 0)
@@ -20,23 +44,27 @@ Ran 4 tests for test-foundry/GovernedTreasury.invariant.t.sol:GovernedTreasuryIn
 ╭----------+----------------------+-------+---------+----------╮
 | Contract | Selector             | Calls | Reverts | Discards |
 +==============================================================+
-| Handler  | approve              | 1430  | 0       | 0        |
+| Handler  | approve              | 1146  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | attackerWithdraws    | 1435  | 0       | 0        |
+| Handler  | attackerGrantsRole   | 1120  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | dualSelfApproves     | 1398  | 0       | 0        |
+| Handler  | attackerRevokesRole  | 1202  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | operatorPaysAttacker | 1398  | 0       | 0        |
+| Handler  | attackerWithdraws    | 1172  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | operatorSelfApproves | 1432  | 0       | 0        |
+| Handler  | dualSelfApproves     | 1204  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | passTime             | 1479  | 0       | 0        |
+| Handler  | operatorPaysAttacker | 1211  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | reject               | 1459  | 0       | 0        |
+| Handler  | operatorSelfApproves | 1185  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | request              | 1428  | 0       | 0        |
+| Handler  | passTime             | 1143  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | withdraw             | 1341  | 0       | 0        |
+| Handler  | reject               | 1116  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | request              | 1152  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | withdraw             | 1149  | 0       | 0        |
 ╰----------+----------------------+-------+---------+----------╯
 
 [PASS] invariant_NingunAtaqueFunciona() (runs: 256, calls: 12800, reverts: 0)
@@ -44,23 +72,27 @@ Ran 4 tests for test-foundry/GovernedTreasury.invariant.t.sol:GovernedTreasuryIn
 ╭----------+----------------------+-------+---------+----------╮
 | Contract | Selector             | Calls | Reverts | Discards |
 +==============================================================+
-| Handler  | approve              | 1430  | 0       | 0        |
+| Handler  | approve              | 1146  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | attackerWithdraws    | 1435  | 0       | 0        |
+| Handler  | attackerGrantsRole   | 1120  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | dualSelfApproves     | 1398  | 0       | 0        |
+| Handler  | attackerRevokesRole  | 1202  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | operatorPaysAttacker | 1398  | 0       | 0        |
+| Handler  | attackerWithdraws    | 1172  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | operatorSelfApproves | 1432  | 0       | 0        |
+| Handler  | dualSelfApproves     | 1204  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | passTime             | 1479  | 0       | 0        |
+| Handler  | operatorPaysAttacker | 1211  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | reject               | 1459  | 0       | 0        |
+| Handler  | operatorSelfApproves | 1185  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | request              | 1428  | 0       | 0        |
+| Handler  | passTime             | 1143  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | withdraw             | 1341  | 0       | 0        |
+| Handler  | reject               | 1116  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | request              | 1152  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | withdraw             | 1149  | 0       | 0        |
 ╰----------+----------------------+-------+---------+----------╯
 
 [PASS] invariant_SoloElTimelockEsAdmin() (runs: 256, calls: 12800, reverts: 0)
@@ -68,23 +100,27 @@ Ran 4 tests for test-foundry/GovernedTreasury.invariant.t.sol:GovernedTreasuryIn
 ╭----------+----------------------+-------+---------+----------╮
 | Contract | Selector             | Calls | Reverts | Discards |
 +==============================================================+
-| Handler  | approve              | 1430  | 0       | 0        |
+| Handler  | approve              | 1146  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | attackerWithdraws    | 1435  | 0       | 0        |
+| Handler  | attackerGrantsRole   | 1120  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | dualSelfApproves     | 1398  | 0       | 0        |
+| Handler  | attackerRevokesRole  | 1202  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | operatorPaysAttacker | 1398  | 0       | 0        |
+| Handler  | attackerWithdraws    | 1172  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | operatorSelfApproves | 1432  | 0       | 0        |
+| Handler  | dualSelfApproves     | 1204  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | passTime             | 1479  | 0       | 0        |
+| Handler  | operatorPaysAttacker | 1211  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | reject               | 1459  | 0       | 0        |
+| Handler  | operatorSelfApproves | 1185  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | request              | 1428  | 0       | 0        |
+| Handler  | passTime             | 1143  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | withdraw             | 1341  | 0       | 0        |
+| Handler  | reject               | 1116  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | request              | 1152  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | withdraw             | 1149  | 0       | 0        |
 ╰----------+----------------------+-------+---------+----------╯
 
 [PASS] invariant_TopesDiarios() (runs: 256, calls: 12800, reverts: 0)
@@ -92,27 +128,31 @@ Ran 4 tests for test-foundry/GovernedTreasury.invariant.t.sol:GovernedTreasuryIn
 ╭----------+----------------------+-------+---------+----------╮
 | Contract | Selector             | Calls | Reverts | Discards |
 +==============================================================+
-| Handler  | approve              | 1430  | 0       | 0        |
+| Handler  | approve              | 1146  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | attackerWithdraws    | 1435  | 0       | 0        |
+| Handler  | attackerGrantsRole   | 1120  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | dualSelfApproves     | 1398  | 0       | 0        |
+| Handler  | attackerRevokesRole  | 1202  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | operatorPaysAttacker | 1398  | 0       | 0        |
+| Handler  | attackerWithdraws    | 1172  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | operatorSelfApproves | 1432  | 0       | 0        |
+| Handler  | dualSelfApproves     | 1204  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | passTime             | 1479  | 0       | 0        |
+| Handler  | operatorPaysAttacker | 1211  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | reject               | 1459  | 0       | 0        |
+| Handler  | operatorSelfApproves | 1185  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | request              | 1428  | 0       | 0        |
+| Handler  | passTime             | 1143  | 0       | 0        |
 |----------+----------------------+-------+---------+----------|
-| Handler  | withdraw             | 1341  | 0       | 0        |
+| Handler  | reject               | 1116  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | request              | 1152  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | withdraw             | 1149  | 0       | 0        |
 ╰----------+----------------------+-------+---------+----------╯
 
-Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 813.58ms (2.77s CPU time)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 1.55s (3.53s CPU time)
 
-Ran 2 test suites in 821.57ms (862.98ms CPU time): 8 tests passed, 0 failed, 0 skipped (8 total tests)
+Ran 8 test suites in 1.56s (1.65s CPU time): 14 tests passed, 0 failed, 0 skipped (14 total tests)
 
 # código de salida: 0

@@ -20,3 +20,8 @@ Cada tarea indica los requisitos que cubre y cómo se validó.
 ## Validación
 Prueba de punta a punta con Playwright contra una red local de Hardhat y una billetera simulada por rol
 (2026-10-26): todas las tareas T03 a T12 verificadas. Pendiente: validación manual con MetaMask en Sepolia.
+
+Estado de validación (revisado el 2026-10-27)
+- [x] T01 a T12 en red local: prueba de punta a punta con Playwright del 2026-10-26, registrada arriba.
+- [x] El panel lee el contrato real en Sepolia: `docs/panel.png` muestra la red Sepolia, el rol Operador detectado (0xd99a…3F73, el operador de `deployments/sepolia.json`) y el saldo de la bóveda (9.240 mARS).
+- [ ] Validación manual con MetaMask en Sepolia (aprobar un pedido desde el panel, rechazar como Guardián, aviso de red equivocada, modo lectura sin billetera). Motivo: no hay hashes de transacciones hechas desde el panel ni capturas de esos casos. El 2026-10-27 se pidieron y llegó la plantilla sin completar.

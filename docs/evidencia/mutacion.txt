@@ -1,0 +1,150 @@
+# Prueba de mutación de invariant_SoloElTimelockEsAdmin (spec 008, RF-T9)
+# 2026-10-27 14:59 UTC · forge 1.7.1 · HEAD 2117e2e
+#
+# Método: se copió el árbol de trabajo a una carpeta del scratchpad, fuera del repo (sin .git, sin .env).
+# En esa copia se agregó a GovernedTreasury un grantRole sin control de acceso (el mutante).
+# Contra el mutante se corrió la invariante NUEVA (este commit) y la VIEJA (HEAD 2117e2e).
+# Esperado: la vieja pasa (no puede detectar el bug) y la nueva falla. Después, la nueva contra el contrato real: pasa.
+# contracts/ del repo real no se modificó: ver git diff --stat contracts/ al final.
+
+## 1. Diff del mutante (solo en la copia)
+--- <scratchpad>/GovernedTreasury.orig.sol	2026-10-27 11:58:27
++++ contracts/GovernedTreasury.sol	2026-10-27 11:58:27
+@@ -384,6 +384,11 @@
+         _setLimits(newLimits);
+     }
+ 
++    // MUTANTE (solo en la copia del scratchpad): grantRole sin control de acceso.
++    function grantRole(bytes32 role, address account) public override {
++        _grantRole(role, account);
++    }
++
+     /// @notice Reanuda la operación después de una pausa.
+     /// @dev Solo el timelock: pausar es inmediato, reanudar espera el delay.
+     function unpause() external onlyRole(DEFAULT_ADMIN_ROLE) {
+
+## 2. Invariante NUEVA contra el mutante → esperado FAIL
+$ forge test --match-test invariant_SoloElTimelockEsAdmin   (en la copia mutante)
+Compiling 50 files with Solc 0.8.24
+Solc 0.8.24 finished in 1.16s
+Compiler run successful!
+{"timestamp":1793113121,"event":"failure","invariant":"invariant_SoloElTimelockEsAdmin","target":"test-foundry/GovernedTreasury.invariant.t.sol:GovernedTreasuryInvariantTest","reason":"un grantRole/revokeRole sin permiso funciono"}
+
+Ran 1 test for test-foundry/GovernedTreasury.invariant.t.sol:GovernedTreasuryInvariantTest
+[FAIL: un grantRole/revokeRole sin permiso funciono]
+	[Sequence] (original: 7, shrunk: 1)
+		sender=0x0000000000000000000000000000000000000bbC addr=[test-foundry/GovernedTreasury.invariant.t.sol:Handler]0x5991A2dF15A8F6A256D3Ec51E99254Cd3fb576A9 calldata=attackerGrantsRole(uint256,uint256,uint256) args=[245432943575261047861328342215385383 [2.454e35], 165401056417440250215204494321518474324 [1.654e38], 13607533692741573208501446251631943877983581543395 [1.36e49]]
+ invariant_SoloElTimelockEsAdmin() (runs: 0, calls: 0, reverts: 0)
+
+╭----------+----------------------+-------+---------+----------╮
+| Contract | Selector             | Calls | Reverts | Discards |
++==============================================================+
+| Handler  | attackerGrantsRole   | 1     | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | operatorSelfApproves | 1     | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | passTime             | 1     | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | reject               | 1     | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | request              | 1     | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | withdraw             | 2     | 0       | 0        |
+╰----------+----------------------+-------+---------+----------╯
+
+Suite result: FAILED. 0 passed; 1 failed; 0 skipped; finished in 10.54ms (9.52ms CPU time)
+
+Ran 1 test suite in 11.28ms (10.54ms CPU time): 0 tests passed, 1 failed, 0 skipped (1 total tests)
+
+Failing tests:
+Encountered 1 failing test in test-foundry/GovernedTreasury.invariant.t.sol:GovernedTreasuryInvariantTest
+[FAIL: un grantRole/revokeRole sin permiso funciono]
+	[Sequence] (original: 7, shrunk: 1)
+		sender=0x0000000000000000000000000000000000000bbC addr=[test-foundry/GovernedTreasury.invariant.t.sol:Handler]0x5991A2dF15A8F6A256D3Ec51E99254Cd3fb576A9 calldata=attackerGrantsRole(uint256,uint256,uint256) args=[245432943575261047861328342215385383 [2.454e35], 165401056417440250215204494321518474324 [1.654e38], 13607533692741573208501446251631943877983581543395 [1.36e49]]
+ invariant_SoloElTimelockEsAdmin() (runs: 0, calls: 0, reverts: 0)
+
+Encountered a total of 1 failing tests, 0 tests succeeded
+
+Tip: Run `forge test --rerun` to retry only the 1 failed test
+
+Fuzz seed: 0x236d315411c4e8161b9b8257ca0970b4006c9910ef9deaa02633a20f4668479b (use `--fuzz-seed` to reproduce)
+
+## 3. Invariante VIEJA contra el mutante → esperado PASS (no detecta la mutación)
+$ git show HEAD:test-foundry/GovernedTreasury.invariant.t.sol > test-foundry/GovernedTreasury.invariant.t.sol   (en la copia)
+$ forge test --match-test invariant_SoloElTimelockEsAdmin
+Compiling 1 files with Solc 0.8.24
+Solc 0.8.24 finished in 1.08s
+Compiler run successful!
+Warning: Failure from "<scratchpad>/mutante/cache/invariant/failures/GovernedTreasuryInvariantTest/invariant_SoloElTimelockEsAdmin" file was ignored because invariant test settings have changed: target selectors changed
+
+Ran 1 test for test-foundry/GovernedTreasury.invariant.t.sol:GovernedTreasuryInvariantTest
+[PASS] invariant_SoloElTimelockEsAdmin() (runs: 256, calls: 12800, reverts: 0)
+
+╭----------+----------------------+-------+---------+----------╮
+| Contract | Selector             | Calls | Reverts | Discards |
++==============================================================+
+| Handler  | approve              | 1434  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | attackerWithdraws    | 1451  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | dualSelfApproves     | 1440  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | operatorPaysAttacker | 1387  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | operatorSelfApproves | 1405  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | passTime             | 1403  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | reject               | 1363  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | request              | 1505  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | withdraw             | 1412  | 0       | 0        |
+╰----------+----------------------+-------+---------+----------╯
+
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 680.37ms (679.50ms CPU time)
+
+Ran 1 test suite in 680.81ms (680.37ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)
+
+## 4. Invariante NUEVA contra el contrato real (repo) → esperado PASS
+$ forge test --match-test invariant_SoloElTimelockEsAdmin
+No files changed, compilation skipped
+
+Ran 1 test for test-foundry/GovernedTreasury.invariant.t.sol:GovernedTreasuryInvariantTest
+[PASS] invariant_SoloElTimelockEsAdmin() (runs: 256, calls: 12800, reverts: 0)
+
+╭----------+----------------------+-------+---------+----------╮
+| Contract | Selector             | Calls | Reverts | Discards |
++==============================================================+
+| Handler  | approve              | 1205  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | attackerGrantsRole   | 1131  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | attackerRevokesRole  | 1180  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | attackerWithdraws    | 1101  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | dualSelfApproves     | 1088  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | operatorPaysAttacker | 1157  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | operatorSelfApproves | 1204  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | passTime             | 1199  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | reject               | 1198  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | request              | 1184  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | withdraw             | 1153  | 0       | 0        |
+╰----------+----------------------+-------+---------+----------╯
+
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 1.32s (1.32s CPU time)
+
+Ran 1 test suite in 1.32s (1.32s CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)
+
+## 5. contracts/ sin cambios en el repo real
+$ git diff --stat contracts/
+(vacío = sin cambios)
+$ git status --short contracts/
+(vacío = sin cambios)

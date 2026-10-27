@@ -19,9 +19,11 @@ contract Handler is Test {
     address internal beneficiary;
     address internal attacker;
     address internal dual; // tiene rol de operador Y de aprobador (escenario de colusión)
+    address internal proposer;
 
     uint256 public totalOut;
     bool public attackSucceeded;
+    bool public roleAttackSucceeded; // un grantRole/revokeRole sin permiso no revirtió
     uint256[] internal pending;
 
     constructor(
@@ -32,7 +34,8 @@ contract Handler is Test {
         address guardian_,
         address beneficiary_,
         address attacker_,
-        address dual_
+        address dual_,
+        address proposer_
     ) {
         treasury = treasury_;
         token = token_;
@@ -42,6 +45,7 @@ contract Handler is Test {
         beneficiary = beneficiary_;
         attacker = attacker_;
         dual = dual_;
+        proposer = proposer_;
     }
 
     function withdraw(uint256 amount) external {
@@ -115,6 +119,38 @@ contract Handler is Test {
         } catch {}
     }
 
+    /// @dev Cuentas sin permiso para administrar roles: ninguna tiene DEFAULT_ADMIN_ROLE.
+    function _account(uint256 seed) internal view returns (address) {
+        address[6] memory accounts = [attacker, operator, approver, guardian, dual, proposer];
+        return accounts[seed % accounts.length];
+    }
+
+    function _role(uint256 seed) internal view returns (bytes32) {
+        bytes32[4] memory roles = [
+            treasury.DEFAULT_ADMIN_ROLE(),
+            treasury.OPERATOR_ROLE(),
+            treasury.APPROVER_ROLE(),
+            treasury.GUARDIAN_ROLE()
+        ];
+        return roles[seed % roles.length];
+    }
+
+    /// @dev Ataque: una cuenta sin permiso intenta darse (o darle a otra) cualquier rol.
+    function attackerGrantsRole(uint256 callerSeed, uint256 roleSeed, uint256 accountSeed) external {
+        vm.prank(_account(callerSeed));
+        try treasury.grantRole(_role(roleSeed), _account(accountSeed)) {
+            roleAttackSucceeded = true;
+        } catch {}
+    }
+
+    /// @dev Ataque: una cuenta sin permiso intenta sacarle cualquier rol a otra.
+    function attackerRevokesRole(uint256 callerSeed, uint256 roleSeed, uint256 accountSeed) external {
+        vm.prank(_account(callerSeed));
+        try treasury.revokeRole(_role(roleSeed), _account(accountSeed)) {
+            roleAttackSucceeded = true;
+        } catch {}
+    }
+
     function passTime(uint256 secs) external {
         secs = bound(secs, 1 hours, 2 days);
         vm.warp(block.timestamp + secs);
@@ -125,16 +161,17 @@ contract Handler is Test {
 /// @notice Reglas que tienen que cumplirse SIEMPRE, después de cualquier secuencia de acciones.
 contract GovernedTreasuryInvariantTest is TreasuryBase {
     Handler internal handler;
+    address internal dual;
 
     function setUp() public override {
         super.setUp();
         // Colusión: vía timelock (el único admin) una cuenta recibe los dos roles.
-        address dual = makeAddr("operador-aprobador");
+        dual = makeAddr("operador-aprobador");
         vm.startPrank(address(timelock));
         treasury.grantRole(treasury.OPERATOR_ROLE(), dual);
         treasury.grantRole(treasury.APPROVER_ROLE(), dual);
         vm.stopPrank();
-        handler = new Handler(treasury, token, operator, approver, guardian, beneficiary, attacker, dual);
+        handler = new Handler(treasury, token, operator, approver, guardian, beneficiary, attacker, dual, proposer);
         targetContract(address(handler));
     }
 
@@ -157,11 +194,17 @@ contract GovernedTreasuryInvariantTest is TreasuryBase {
         assertLe(direct, 1_000e18, "se supero el tope sin doble firma");
     }
 
-    /// @notice Nadie fuera del timelock es admin de la tesorería.
+    /// @notice Nadie fuera del timelock es admin de la tesorería, y ningún grantRole/revokeRole
+    ///         desde una cuenta sin permiso prospera.
+    /// @dev Antes de la spec 008 el handler no tocaba roles y esta invariante no podía fallar.
+    ///      Ahora attackerGrantsRole y attackerRevokesRole lo intentan desde seis cuentas.
     function invariant_SoloElTimelockEsAdmin() public view {
         bytes32 admin = treasury.DEFAULT_ADMIN_ROLE();
         assertTrue(treasury.hasRole(admin, address(timelock)));
-        assertFalse(treasury.hasRole(admin, address(this)));
-        assertFalse(treasury.hasRole(admin, operator));
+        assertFalse(handler.roleAttackSucceeded(), "un grantRole/revokeRole sin permiso funciono");
+        address[8] memory others = [address(this), address(handler), attacker, operator, approver, guardian, proposer, dual];
+        for (uint256 i; i < others.length; ++i) {
+            assertFalse(treasury.hasRole(admin, others[i]), "una cuenta sin permiso es admin");
+        }
     }
 }

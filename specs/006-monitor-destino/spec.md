@@ -1,6 +1,6 @@
-Spec 006 — Monitor: decodificar la llamada programada según su destino (BORRADOR · esperando aprobación)
+Spec 006 — Monitor: decodificar la llamada programada según su destino
 
-Estado: borrador. No se toca `scripts/monitor.js` hasta que el usuario apruebe esta spec.
+Estado: aprobada por el usuario el 2026-10-27. La prueba va en `scripts/check-monitor-destino.js` y corre como paso del CI (spec 005, RF-C6).
 
 El bug (uno solo)
 - `describeScheduled` (`scripts/monitor.js:63-70`) decodifica el `data` de cada `CallScheduled` y `CallExecuted` siempre con el ABI de la tesorería, y la alerta no dice a qué contrato apunta la llamada (`monitor.js:80-86`). El evento trae el destino en `target`, pero el monitor no lo usa.
@@ -24,8 +24,8 @@ RNF-M2	Prueba con llamadas armadas a mano: `scripts/check-monitor-destino.js` ar
 RNF-M3	Cambio chico: el arreglo no reescribe `monitor.js`. Solo cambian `describeScheduled` y los dos `case` que la usan.
 RNF-M4	Sin secretos ni red: el script de prueba no carga `dotenv` ni crea un provider.
 
-Decisión a confirmar
-- Ubicación de la prueba. Recomiendo `scripts/check-monitor-destino.js`, fuera de `test/`, para no cambiar el número de tests ("29") que citan el README, `AGENTS.md` y la spec 005. La contra es que no corre en CI. La alternativa es `test/monitor-destino.test.js`: corre con `npm test` y en CI, pero obliga a actualizar el número de tests en esos tres lugares con una corrida nueva.
+Decisión tomada
+- La prueba va en `scripts/check-monitor-destino.js`, fuera de `test/`, para no cambiar el conteo de tests de Hardhat. Para que no quede fuera de CI, el workflow suma un paso `node scripts/check-monitor-destino.js` después de `npx hardhat test` (que deja `artifacts/` compilado).
 
 Documentación
 - README, sección Monitor: la fila 🔴 CRÍTICA suma "Cambio programado o ejecutado hacia un destino desconocido" (RF-R11 de la spec 003 pide los niveles tal como están en `monitor.js`).
@@ -36,8 +36,8 @@ Fuera de alcance
 - La detección de transacciones rechazadas que entran a través de otro contrato (`monitor.js:123`).
 
 Validación
-- [ ] Spec aprobada por el usuario.
-- [ ] RF-M1 a RF-M4: salida de `node scripts/check-monitor-destino.js` con los 4 casos OK.
-- [ ] RNF-M3: `git diff scripts/monitor.js` acotado a `describeScheduled` y a los `case` de `CallScheduled` y `CallExecuted`.
-- [ ] RNF-M4: `grep -nE "dotenv|JsonRpcProvider" scripts/check-monitor-destino.js scripts/lib/describe-call.js` vacío.
-- [ ] README: fila CRÍTICA actualizada.
+- [x] Spec aprobada por el usuario (2026-10-27).
+- [x] RF-M1 a RF-M4: `node scripts/check-monitor-destino.js` → 6 casos OK, código de salida 0 (`docs/evidencia/monitor-destino.txt`, 2026-10-27). Son 6 y no 4 porque RF-M2 y RF-M4 tienen dos casos cada uno. El check prueba `describeCall`; el armado del texto de `notify` en `monitor.js` se revisó leyendo el diff, sin red.
+- [x] RNF-M3: `git diff scripts/monitor.js` toca `describeScheduled`, los `case` de `CallScheduled` y `CallExecuted` y, además, una línea `require("./lib/describe-call")` al principio, que hace falta para importar la función.
+- [x] RNF-M4: `grep -nE "dotenv|JsonRpcProvider" scripts/check-monitor-destino.js scripts/lib/describe-call.js` sin coincidencias (exit 1), 2026-10-27.
+- [x] README: la fila CRÍTICA de la sección Monitor suma "Cambio programado o ejecutado hacia un destino desconocido". CI: paso `node scripts/check-monitor-destino.js` en `.github/workflows/ci.yml` (spec 005, RF-C6).

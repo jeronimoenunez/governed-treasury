@@ -1,5 +1,5 @@
 $ npm test
-# 2026-10-27 13:16 UTC · node v22.23.4
+# 2026-10-27 15:00 UTC · node v22.23.4 · HEAD 2117e2e + cambios sin commitear de la spec 008
 
 
 > governed-treasury@1.0.0 test
@@ -9,7 +9,7 @@ $ npm test
 
   GovernedTreasury
     Despliegue
-      ✔ reparte los roles y el deployer no se queda con ninguno (280ms)
+      ✔ reparte los roles y el deployer no se queda con ninguno (272ms)
       ✔ rechaza configuraciones inválidas en el constructor
     Depósito
       ✔ acepta depósitos y emite Deposited
@@ -48,6 +48,6 @@ $ npm test
       ✔ un token malicioso que intenta reentrar es bloqueado por nonReentrant
 
 
-  29 passing (365ms)
+  29 passing (366ms)
 
 # código de salida: 0

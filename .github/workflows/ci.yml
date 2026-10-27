@@ -29,6 +29,10 @@ jobs:
       # 29 tests unitarios y de ataque, en la red local en memoria de Hardhat.
       - run: npx hardhat test
 
+      # Spec 006: el monitor decodifica cada llamada programada según su destino.
+      # Usa artifacts/, que dejó compilado el paso anterior. Sin red ni secretos.
+      - run: node scripts/check-monitor-destino.js
+
       # Versión fija del stack. forge baja el solc 0.8.24 que pide foundry.toml.
       - uses: foundry-rs/foundry-toolchain@v1
         with:

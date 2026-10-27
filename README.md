@@ -1,12 +1,25 @@
 # GovernedTreasury
 
-**Proyecto final del Ethereum Developer Pack (ETH Kipu · Talento Tech). Autor: Jerónimo Núñez.**
+**Proyecto final del Ethereum Developer Pack (ETH Kipu · Talento Tech). Autor: Jerónimo Núñez. Entrega individual.**
 
 [![CI](https://github.com/jeronimoenunez/governed-treasury/actions/workflows/ci.yml/badge.svg)](https://github.com/jeronimoenunez/governed-treasury/actions/workflows/ci.yml)
 
 Tesorería on-chain de tokens ERC-20 simulando los controles internos que tiene cualquier banco: quien pide un pago no es quien lo aprueba, los montos grandes llevan doble firma, hay topes por operación y por día, solo se paga a destinos agendados y cualquier cambio de reglas espera 72 horas a la vista de todos. El problema que resuelve es el de los contratos con `onlyOwner`: ahí una sola clave puede vaciar la bóveda o cambiar las reglas en una transacción, sin segunda firma, sin espera y sin que nadie pueda frenarla. Si roban esa clave, se pierde todo. Acá no existe esa clave: ninguna cuenta sola puede vaciar la bóveda ni ampliar las reglas al instante. Ampliar permisos espera 72 h a la vista y en ese lapso el guardián lo puede cancelar; restringir (pausar, revocar un destino) sí es inmediato. Si nadie cancela, el cambio se aplica: ver [Riesgos conocidos](#riesgos-conocidos-lo-que-no-cubre).
 
 ![Panel de la tesorería: saldo, uso de topes del día, gobernanza y movimientos](docs/panel.png)
+
+## ¿Por qué blockchain?
+
+Una tesorería con estos controles se puede armar en un sistema tradicional. La diferencia está en quién garantiza que se cumplan.
+
+- **Reglas que se cumplen sin confiar en un operador.** Los topes, la doble firma y la espera de 72 h están en el contrato. Ni el administrador del servidor, ni el proveedor, ni yo podemos saltearlos con un acceso privilegiado a la base de datos: no hay base de datos que editar.
+- **Trazabilidad pública e inmutable.** Cada depósito, pedido, aprobación, rechazo y cambio de reglas queda en la cadena con fecha y firmante. Nadie puede borrar ni reescribir el historial después.
+- **Controles que cualquiera puede verificar.** El código está publicado y verificado en Etherscan. Un auditor, un socio o un regulador puede leer las reglas y comprobar con transacciones reales que se cumplen, sin pedirle permiso a nadie.
+
+**Cuándo no conviene:**
+- **Privacidad de montos.** Todo es público: saldo, montos, destinos y horarios. Una empresa que no quiere mostrar sus pagos necesita otra solución (redes privadas, pruebas de conocimiento cero) o directamente un sistema tradicional.
+- **Costo de gas.** Cada operación cuesta una comisión de red. Para muchos pagos chicos o frecuentes, una red principal cara no cierra; ver los números de [Gas](#gas--npm-run-testgas).
+- **Las claves son un punto único.** El contrato elimina al administrador todopoderoso, pero cada rol sigue siendo una clave privada. Si se pierde, no hay "recuperar contraseña"; si la roban, el atacante actúa con ese rol. Ver [Riesgos conocidos](#riesgos-conocidos-lo-que-no-cubre).
 
 ## Contratos en Sepolia (verificados)
 
@@ -66,30 +79,34 @@ flowchart LR
 | Pago a una dirección del atacante | Allowlist, revalidada al aprobar | Test *"no se puede enviar a una dirección fuera de la allowlist"*, fuzz `testFuzz_DestinoNoAgendadoSiempreRechazado`, [tx rechazada](https://sepolia.etherscan.io/tx/0x76ca3646c202fa1f5cb36a77d9349b86aa9d1c2e402ea6bfa80c9249bf66c47c) |
 | Aprobar dos veces o un pedido vencido | Estado `Pending` + vencimiento de 3 días | Tests *"no se puede aprobar dos veces el mismo pedido"* y *"una orden vencida no se puede aprobar"* |
 | Proponente comprometido agrega un beneficiario propio | Timelock de 72 h + guardián cancela | Tests *"un cambio no se puede ejecutar antes de 72 horas"* y *"el guardián cancela un cambio sospechoso durante la espera"*, [ejecución temprana rechazada](https://sepolia.etherscan.io/tx/0xff5851a3a9bef54068ff4e478ab59714b3a096b85a9ae8105971bcc233810265), [cancelación](https://sepolia.etherscan.io/tx/0x09bd764b1313ccec881d6559668b30af22f8ef5b749fb454ca09dce55838ec71) |
-| Alguien toma el control de admin | Solo el timelock es admin; nadie más | Test *"nadie cambia la configuración sin pasar por el timelock"*. La invariante `invariant_SoloElTimelockEsAdmin` hoy no puede fallar: el handler no tiene ninguna función que toque roles, así que no prueba nada por sí sola |
+| Alguien toma el control de admin | Solo el timelock es admin; nadie más | Test *"nadie cambia la configuración sin pasar por el timelock"*, invariante `invariant_SoloElTimelockEsAdmin`: el handler intenta `grantRole` y `revokeRole` desde seis cuentas sin permiso. Hasta la spec 008 no podía fallar (GT-08); ahora detecta una mutación ([`mutacion.txt`](docs/evidencia/mutacion.txt)) |
 | Token que reentra en la bóveda | CEI + `nonReentrant` | Test *"un token malicioso que intenta reentrar es bloqueado por nonReentrant"* |
 | Se pierden o aparecen fondos | Contabilidad de entradas/salidas | Invariante `invariant_ConservacionDeFondos` |
 
 ### Riesgos conocidos: lo que no cubre
 
-Salen de una auditoría propia del 2026-10-27. Los contratos desplegados no se tocan: cada fix es para una v2 con deploy nuevo.
+Salen de una revisión asistida por IA, con cada hallazgo verificado contra el código y demostrado con PoCs (2026-10-27). El detalle, con severidad, descripción, PoC y recomendación, está en el **[informe de revisión de seguridad](docs/auditoria.md)**. Los contratos desplegados no se tocan: cada fix es para una v2 con deploy nuevo ([spec 007](specs/007-safe-y-rotacion/spec.md)).
 
-| Riesgo | Por qué pasa | Fix propuesto para la v2 |
-|---|---|---|
-| Operador y aprobador comprometidos a la vez | Pueden sacar hasta el tope diario (3.000 mARS) por día hacia beneficiarios ya agendados. Los topes acotan el daño, no lo evitan | Roles como multi-firma (Safe) M-de-N |
-| Guardián que bloquea el `unpause` para siempre | El guardián pausa al instante y además puede cancelar en el timelock ([`deploy.js:57`](scripts/deploy.js#L57)). Si es malicioso, cancela cada `unpause` y cada intento de sacarle el rol: los fondos quedan congelados sin límite. No roba, pero no es una denegación de servicio pasajera | Pausa con vencimiento (se levanta sola a los 7 días salvo que el timelock la renueve) y guardián como Safe M-de-N |
-| Roles combinables después del constructor | `RolesMustBeDistinct` solo se chequea al desplegar. Vía timelock una cuenta puede recibir operador y aprobador (la invariante lo hace a propósito); lo único que la frena es `SelfApprovalNotAllowed`. Que el guardián sea distinto del aprobador lo chequea solo `deploy.js` | Override de `_grantRole` que rechace juntar `OPERATOR_ROLE` con `APPROVER_ROLE` o `GUARDIAN_ROLE` en una cuenta |
-| Proponente sin vigilancia | El proponente es el único que programa y el único que ejecuta ([`deploy.js:52`](scripts/deploy.js#L52)). Con una clave robada programa darse los roles, agendar su dirección y subir los topes; a las 72 h lo ejecuta solo. Lo frena únicamente que el guardián vea la alerta del monitor y cancele | Proponente y ejecutor distintos, ambos Safe M-de-N, y monitor redundante (dos procesos, dos canales) |
-| Borde del día calendario UTC | El día es `block.timestamp / 1 days`: 3.000 a las 23:59 y 3.000 a las 00:00 son 6.000 en minutos. Se eligió así porque el gasto del día entra en un solo slot de storage; una ventana real de 24 h exige guardar cada retiro con su hora | Ventana deslizante con dos cubetas (día actual + anterior ponderado): un slot más por retiro |
-| Tokens con comisión y tokens mandados por error | `deposit` emite el monto pedido, no el recibido. Otro ERC-20 que llegue a la bóveda queda trabado: no hay función de rescate (sería otro poder de admin) | Medir el saldo antes y después en `deposit`, y `rescue(token)` solo vía timelock que no pueda tocar el token custodiado |
-| Umbral no revalidado y borde de `expiresAt` | Al aprobar se revalidan allowlist, tope por operación y tope diario, pero no el umbral de doble firma. Los pedidos pendientes no reservan cupo del día. Y como la comparación es `block.timestamp > expiresAt`, en el segundo exacto del vencimiento todavía se puede aprobar | Revalidar `amount >= approvalThreshold` al aprobar y usar `>=` en el vencimiento |
-| El token custodiado | La bóveda confía en el ERC-20. Un token con bugs o con dueño malicioso queda fuera del alcance | Elegir el token en el deploy con la misma revisión que el contrato |
-| Claves del deploy y de los roles | Viven fuera del contrato (billeteras, `.env` local). Su custodia no la resuelve este código | Billeteras de hardware o Safe por rol |
-| MockToken | Tiene dueño que puede emitir: es solo para testnet | No aplica en producción: se custodia un token real |
+> Las PoC **pasan cuando el ataque funciona**. Que el CI esté en verde significa que cada hallazgo sigue siendo reproducible, no que el sistema sea seguro. Cuando la v2 corrija uno, su PoC va a fallar y se invierte como test de regresión.
+
+| ID · severidad | Riesgo | Por qué pasa | Fix propuesto para la v2 | PoC |
+|---|---|---|---|---|
+| GT-01 · Media | Guardián que bloquea el `unpause` para siempre | El guardián pausa al instante y además puede cancelar en el timelock ([`deploy.js:57`](scripts/deploy.js#L57)). Si es malicioso, cancela cada `unpause` y cada intento de sacarle el rol: los fondos quedan congelados sin límite. No roba, pero no es una denegación de servicio pasajera | Pausa con vencimiento (se levanta sola a los 7 días salvo que el timelock la renueve) y guardián como Safe M-de-N | [`GT01_GuardianCongela.t.sol`](test-foundry/poc/GT01_GuardianCongela.t.sol) |
+| GT-02 · Media | Proponente sin vigilancia | El proponente es el único que programa y el único que ejecuta ([`deploy.js:52`](scripts/deploy.js#L52)). Con una clave robada programa darse los roles, agendar su dirección y subir los topes; a las 72 h lo ejecuta solo. Lo frena únicamente que el guardián vea la alerta del monitor y cancele. Es un riesgo de centralización: exige comprometer un rol privilegiado y hay 72 h para reaccionar | Proponente y ejecutor distintos, ambos Safe M-de-N, y monitor redundante (dos procesos, dos canales) | [`GT02_ProponenteVacia.t.sol`](test-foundry/poc/GT02_ProponenteVacia.t.sol) |
+| GT-03 · Baja | Borde del día calendario UTC | El día es `block.timestamp / 1 days`: 3.000 a las 23:59 y 3.000 a las 00:01 son 6.000 en dos minutos. Se eligió así porque el gasto del día entra en un solo slot de storage; una ventana real de 24 h exige guardar cada retiro con su hora | Ventana deslizante con dos cubetas (día actual + anterior ponderado): un slot más por retiro | [`GT03_Medianoche.t.sol`](test-foundry/poc/GT03_Medianoche.t.sol) |
+| GT-04 · Informativa | Tokens con comisión y tokens mandados por error | `deposit` emite el monto pedido, no el recibido. Otro ERC-20 que llegue a la bóveda queda trabado: no hay función de rescate (sería otro poder de admin) | Medir el saldo antes y después en `deposit`, y `rescue(token)` solo vía timelock que no pueda tocar el token custodiado | [`GT04_TokenConComision.t.sol`](test-foundry/poc/GT04_TokenConComision.t.sol) |
+| GT-05 · Informativa | Umbral no revalidado y borde de `expiresAt` | Al aprobar se revalidan allowlist, tope por operación y tope diario, pero no el umbral de doble firma. Los pedidos pendientes no reservan cupo del día. Y como la comparación es `block.timestamp > expiresAt`, en el segundo exacto del vencimiento todavía se puede aprobar | Revalidar `amount >= approvalThreshold` al aprobar y usar `>=` en el vencimiento | [`GT05_BordeVencimiento.t.sol`](test-foundry/poc/GT05_BordeVencimiento.t.sol) |
+| GT-06 · Baja | Roles combinables después del constructor | `RolesMustBeDistinct` solo se chequea al desplegar. Vía timelock una cuenta puede recibir operador y aprobador (la invariante lo hace a propósito); lo único que la frena es `SelfApprovalNotAllowed`. Que el guardián sea distinto del aprobador lo chequea solo `deploy.js` | Override de `_grantRole` que rechace juntar `OPERATOR_ROLE` con `APPROVER_ROLE` o `GUARDIAN_ROLE` en una cuenta | setUp de [`GovernedTreasury.invariant.t.sol`](test-foundry/GovernedTreasury.invariant.t.sol) |
+| Aceptado | Operador y aprobador comprometidos a la vez | Pueden sacar hasta el tope diario (3.000 mARS) por día hacia beneficiarios ya agendados. Los topes acotan el daño, no lo evitan | Roles como multi-firma (Safe) M-de-N | — |
+| Aceptado | El token custodiado | La bóveda confía en el ERC-20. Un token con bugs o con dueño malicioso queda fuera del alcance | Elegir el token en el deploy con la misma revisión que el contrato | — |
+| Aceptado | Claves del deploy y de los roles | Viven fuera del contrato (billeteras, `.env` local). Su custodia no la resuelve este código | Billeteras de hardware o Safe por rol | — |
+| Aceptado | MockToken | Tiene dueño que puede emitir: es solo para testnet | No aplica en producción: se custodia un token real | — |
+
+Dos hallazgos más ya están corregidos, porque no requerían deploy: **GT-07**, el monitor describía mal las operaciones programadas sobre el timelock ([spec 006](specs/006-monitor-destino/spec.md)), y **GT-08**, la invariante de admin no podía fallar ([spec 008](specs/008-red-team/spec.md)).
 
 ## Evidencia: números de esta corrida
 
-Corrida del 2026-10-27 (UTC). Todo lo de esta sección sale de correr los comandos en ese momento. Las salidas completas, sin editar, están en [`docs/evidencia/`](docs/evidencia/).
+Corridas del 2026-10-27 (UTC). Todo lo de esta sección sale de correr los comandos en ese momento. Las salidas completas, sin editar, están en [`docs/evidencia/`](docs/evidencia/), y la lectura de seguridad de estos resultados, en el [informe de revisión](docs/auditoria.md).
 
 ### Tests — `npm test`
 
@@ -132,7 +149,7 @@ Solc 0.8.24, optimizer activado, 200 runs. Salida: [`docs/evidencia/gas.txt`](do
 
 ### Fuzzing e invariantes — `npm run fuzz`
 
-Foundry (forge 1.7.1). **8 tests pasan, 0 fallan.** Salida: [`docs/evidencia/fuzz.txt`](docs/evidencia/fuzz.txt).
+Foundry (forge 1.7.1). **14 tests pasan, 0 fallan**: 4 fuzz, 4 invariantes, 5 PoC del red team y 1 de sanidad de la base de las PoC. Salida: [`docs/evidencia/fuzz.txt`](docs/evidencia/fuzz.txt).
 
 | Test | Tipo | Corridas | Resultado |
 |---|---|---|---|
@@ -144,10 +161,18 @@ Foundry (forge 1.7.1). **8 tests pasan, 0 fallan.** Salida: [`docs/evidencia/fuz
 | `invariant_NingunAtaqueFunciona` | Invariante | 256 runs · 12.800 llamadas | PASS |
 | `invariant_SoloElTimelockEsAdmin` | Invariante | 256 runs · 12.800 llamadas | PASS |
 | `invariant_TopesDiarios` | Invariante | 256 runs · 12.800 llamadas | PASS |
+| `test_PocBase_ReplicaElDeploy` | Sanidad de la base de las PoC | 1 | PASS |
+| `test_PoC_GT01_GuardianCancelaCadaUnpause` | PoC (pasa = el ataque funciona) | 1 | PASS |
+| `test_PoC_GT02_ProponenteSinVigilanciaVaciaLaBoveda` | PoC (pasa = el ataque funciona) | 1 | PASS |
+| `test_PoC_GT03_SeisMilEnDosMinutosCruzandoMedianoche` | PoC (pasa = el ataque funciona) | 1 | PASS |
+| `test_PoC_GT04_DepositedNoCoincideConLoRecibido` | PoC (pasa = el ataque funciona) | 1 | PASS |
+| `test_PoC_GT05_SeApruebaEnElSegundoExactoDelVencimiento` | PoC (pasa = el ataque funciona) | 1 | PASS |
 
 Las invariantes usan un *handler* que mezcla operaciones legítimas con ataques (pagarle al atacante, autoaprobarse, retirar sin rol) y variables fantasma para llevar la cuenta por fuera del contrato. Ver [`test-foundry/`](test-foundry/).
 
-Una aclaración honesta: `invariant_SoloElTimelockEsAdmin` hoy no puede fallar. El handler no tiene ninguna función que otorgue o revoque roles, así que ninguna secuencia aleatoria llega a cambiar quién es admin; además solo revisa tres direcciones. Para que pruebe algo, el handler tendría que intentar `grantRole` desde cuentas sin permiso y programar cambios en el timelock.
+`invariant_SoloElTimelockEsAdmin` no podía fallar hasta la spec 008: el handler no tocaba roles (GT-08). Ahora intenta `grantRole` y `revokeRole` desde seis cuentas sin permiso. Para comprobar que la invariante sirve, en una copia del repo se le agregó a la tesorería un `grantRole` sin control de acceso: la invariante vieja pasó igual y la nueva falló. El diff y las salidas están en [`docs/evidencia/mutacion.txt`](docs/evidencia/mutacion.txt); `contracts/` no se tocó.
+
+Las PoC de `test-foundry/poc/` reproducen los hallazgos de [Riesgos conocidos](#riesgos-conocidos-lo-que-no-cubre) y **pasan cuando el ataque funciona**. Para correr solo esas: `forge test --mt PoC`.
 
 ### Análisis estático — `npm run slither`
 
@@ -192,22 +217,25 @@ Las rechazadas quedan registradas en la cadena con estado *Fail*: el contrato la
 
 [`frontend/`](frontend/) es una app React 19 + Vite + wagmi + viem que habla directo con la blockchain, sin backend. Cada rol opera desde el navegador: el operador retira y pide, el aprobador aprueba o rechaza pedidos ajenos, el guardián tiene su panel de emergencia y cualquier cuenta deposita. Muestra saldo, uso de los topes del día, cambios programados en el timelock con su cuenta regresiva, movimientos con link a Etherscan y los ataques rechazados de la evidencia en Sepolia.
 
-La app nunca pide ni guarda claves: toda firma pasa por la billetera, que muestra acción, monto y destino antes de firmar. La seguridad real está en el contrato; el panel ayuda pero no protege.
+La app nunca pide ni guarda claves: toda firma pasa por la billetera, que muestra acción, monto y destino antes de firmar.
+
+**El frontend no decide: decide el contrato.** El panel solo arma transacciones y le pide a la billetera que las firme. Si alguien comprometiera el frontend (un deploy alterado, una dependencia maliciosa), lo peor que podría hacer es pedir firmas para operaciones que el contrato acepta de todos modos: retiros dentro de los topes, hacia destinos agendados y con doble firma desde el umbral. No puede inventar un destino nuevo ni saltear el timelock, porque esas reglas no viven en el navegador. La allowlist y los topes acotan el daño; revisar en la billetera qué se firma sigue siendo responsabilidad de cada rol.
 
 Se construyó con Spec-Driven Development: constitución → especificación → plan → tareas → implementación → validación.
 
 - [Constitución](specs/constitucion.md): los principios que ninguna spec puede romper.
 - [001 — Frontend](specs/001-frontend/spec.md) · [plan](specs/001-frontend/plan.md) · [tareas](specs/001-frontend/tasks.md)
-- [002 — Panel de tesorería](specs/002-panel/spec.md): se implementó sin `plan.md` ni `tasks.md` separados; la spec es el único documento.
+- [002 — Panel de tesorería](specs/002-panel/spec.md): se implementó sin `plan.md` ni `tasks.md` separados; la spec es el único documento. Lo que se aprendió está en la [retrospectiva](specs/002-panel/retro.md).
 - [003 — Este README](specs/003-readme/spec.md)
+- [005 — CI](specs/005-ci/spec.md) · [006 — Monitor: destino de las llamadas](specs/006-monitor-destino/spec.md) · [007 — Safe M-de-N y rotación de claves (borrador)](specs/007-safe-y-rotacion/spec.md) · [008 — Red team](specs/008-red-team/spec.md)
 
 ## Monitor de alertas
 
-[`scripts/monitor.js`](scripts/monitor.js) recorre bloque por bloque la tesorería y el timelock, y avisa por consola y, si están configurados, por Slack y Telegram. También detecta transacciones **rechazadas**, que no emiten eventos: las busca en cada bloque.
+[`scripts/monitor.js`](scripts/monitor.js) recorre bloque por bloque la tesorería y el timelock, y avisa por consola y, si están configurados, por Slack y Telegram. También detecta transacciones **rechazadas**, que no emiten eventos: las busca en cada bloque. Cada cambio programado en el timelock se decodifica con el ABI de su destino (tesorería o timelock) y la alerta muestra siempre a qué contrato apunta; si el destino es otro, la alerta es CRÍTICA con la dirección completa ([spec 006](specs/006-monitor-destino/spec.md)). Se prueba sin red con `node scripts/check-monitor-destino.js`, que también corre en el CI.
 
 | Nivel | Cuándo |
 |---|---|
-| 🔴 CRÍTICA | Cambio programado en el timelock · Cambio ejecutado por el timelock · Tesorería pausada · Beneficiario habilitado · Límites modificados · Rol otorgado · Intento rechazado por el contrato |
+| 🔴 CRÍTICA | Cambio programado en el timelock · Cambio ejecutado por el timelock · Cambio programado o ejecutado hacia un destino desconocido · Tesorería pausada · Beneficiario habilitado · Límites modificados · Rol otorgado · Intento rechazado por el contrato |
 | 🟠 ATENCIÓN | Cambio cancelado en el timelock · Tesorería reanudada · Beneficiario revocado · Rol revocado · Pedido de retiro con doble firma |
 | 🟢 INFO | Pedido aprobado · Pedido rechazado · Retiro ejecutado · Depósito |
 
@@ -220,11 +248,13 @@ git clone https://github.com/jeronimoenunez/governed-treasury.git
 cd governed-treasury
 npm install
 
+npx hardhat compile  # compilar los contratos
 npm test             # tests unitarios (Hardhat)
 npm run coverage     # cobertura
 npm run test:gas     # reporte de gas
 npm run fuzz         # fuzzing e invariantes (Foundry)
 npm run slither      # análisis estático
+node scripts/check-monitor-destino.js   # decodificación del monitor, sin red
 ```
 
 `npm run fuzz` está armado para macOS: corre offline con el solc 0.8.24 que Hardhat descarga en `~/Library/Caches/hardhat-nodejs/compilers-v2/macosx-amd64/` (hace falta un `npx hardhat compile` antes). En otra máquina, con Foundry instalado, corré `forge test`: `foundry.toml` fija `solc_version = "0.8.24"` y forge lo descarga solo. Si en macOS dice `forge: command not found`, el link de `@foundry-rs/forge` en `node_modules/.bin` no se creó: agregá `node_modules/@foundry-rs/forge-darwin-arm64/bin` al `PATH`.
@@ -270,12 +300,13 @@ Las direcciones y ABI que usa el panel ya están en `frontend/src/contracts/`. S
 
 ## Cómo se trabajó con IA
 
-Usé un agente de código (Claude Code) como asistente, con reglas escritas para que no improvise:
+La IA asistió en todo el proyecto: en los borradores del contrato, los tests, los scripts, el panel y la documentación. Usé un agente de código (Claude Code). Las decisiones de diseño, el deploy, las pruebas en Sepolia y la validación final las hice yo. Para que el agente no improvisara, trabajé con reglas escritas:
 
-- **Spec primero.** Ninguna funcionalidad se implementa sin una spec aprobada en [`specs/`](specs/constitucion.md): primero los requisitos con su criterio de aceptación, después el plan y recién ahí el código. Las decisiones las tomo yo; el agente propone.
+- **Spec primero.** Ninguna funcionalidad se implementa sin una spec aprobada en [`specs/`](specs/constitucion.md): primero los requisitos con su criterio de aceptación, después el plan y recién ahí el código. El agente propone; yo apruebo o corrijo.
 - **[`AGENTS.md`](AGENTS.md)** fija lo que no se negocia: los contratos desplegados no se tocan, nada corre contra Sepolia sin confirmación, no se hacen commits ni push sin pedirlo.
 - **Permisos denegados** en [`.claude/settings.json`](.claude/settings.json): bloquean los caminos directos, que son leer o editar `.env` con las herramientas del agente, `cat .env`, `npm audit fix --force`, los comandos de deploy e interacción contra Sepolia tal como están escritos y editar `contracts/`. Para hacer commit o push tiene que pedir permiso. Son una red de seguridad, no un encierro: una variante del comando (otra forma de leer el archivo, `--network=sepolia` en vez de `--network sepolia`) no coincide con la regla. Por eso las mismas reglas están también escritas en `AGENTS.md`.
 - **Ningún número sin comando.** Cada cifra de este README (tests, cobertura, gas, fuzzing, Slither) sale de correr el comando durante la redacción, y las salidas quedan en [`docs/evidencia/`](docs/evidencia/). Si un comando falla, se marca como pendiente en lugar de completarlo de memoria.
+- **Revisión de seguridad.** Fue una revisión asistida por IA, con cada hallazgo verificado contra el código y demostrado con PoCs ([informe](docs/auditoria.md)). No es una auditoría externa.
 
 El agente acelera la escritura y la revisión. No reemplaza entender el código: cada línea se puede defender sin él.
 
@@ -283,9 +314,10 @@ El agente acelera la escritura y la revisión. No reemplaza entender el código:
 
 | Próximo paso | Para qué |
 |---|---|
-| Multi-firma (Safe) en los roles | Que cada rol sea M-de-N en vez de una sola cuenta: comprometer al aprobador exigiría varias claves |
+| Multi-firma (Safe) en los roles | Que cada rol sea M-de-N en vez de una sola cuenta: comprometer al aprobador exigiría varias claves. Borrador: [spec 007](specs/007-safe-y-rotacion/spec.md) |
+| v2 del contrato con los fixes GT-01 a GT-06 | Cerrar los hallazgos del [informe](docs/auditoria.md). Cada PoC se invierte como test de regresión. Detalle en la [spec 007](specs/007-safe-y-rotacion/spec.md) |
 | Límites por beneficiario | Que un proveedor chico no pueda recibir lo mismo que uno grande |
 | Referencia de factura en cada retiro | Atar cada pago a un comprobante para conciliar y auditar |
-| Agente de IA de solo lectura | Que explique la actividad y detecte patrones de riesgo sin claves ni firma. En clarificación: [spec 004](specs/004-agente-analista/spec.md) |
-| Rotación de claves | Procedimiento probado para reemplazar una cuenta de rol comprometida vía timelock |
+| Agente de IA de solo lectura | Que explique la actividad y detecte patrones de riesgo sin claves ni firma. Clarificada, para la v2: [spec 004](specs/004-agente-analista/spec.md) |
+| Rotación de claves | Procedimiento para reemplazar una cuenta de rol comprometida vía timelock: [spec 007](specs/007-safe-y-rotacion/spec.md) |
 | Deploy del panel en Vercel | Que cualquiera lo abra sin clonar el repo |

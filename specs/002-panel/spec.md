@@ -27,5 +27,5 @@ Extiende `001-frontend`. Misma constitución: el frontend no modifica los contra
 
 ## Validación
 
-- [ ] Local (Hardhat): panel completo con actividad de varios días.
-- [ ] Sepolia: los gráficos muestran los movimientos reales del contrato verificado.
+- [ ] Local (Hardhat): panel completo con actividad de varios días. Motivo: no hay captura ni registro de una corrida local con actividad de varios días (ver `retro.md`).
+- [ ] Sepolia: los gráficos muestran los movimientos reales del contrato verificado. Motivo: en `docs/panel.png` los gráficos de movimientos todavía dicen "Leyendo el historial de la cadena…"; falta una captura con el historial cargado.

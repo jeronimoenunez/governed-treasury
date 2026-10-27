@@ -25,8 +25,9 @@ Qué	Comando
 Tests unitarios (29)	npm test
 Cobertura	npm run coverage
 Gas	npm run test:gas
-Fuzzing e invariantes (8)	npm run fuzz
+Fuzzing, invariantes y PoC del red team (14)	npm run fuzz
 Análisis estático	npm run slither
+Check del monitor, sin red (6 casos)	node scripts/check-monitor-destino.js
 Monitor de alertas	npm run monitor (necesita .env; correrlo solo si el usuario lo pide)
 Frontend	cd frontend && npm run dev · npm run lint · npm run build
 Exportar ABI y direcciones al frontend	node scripts/export-frontend.js sepolia

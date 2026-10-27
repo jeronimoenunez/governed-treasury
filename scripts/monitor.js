@@ -9,6 +9,7 @@ require("dotenv").config({ quiet: true });
 const { ethers } = require("ethers");
 const fs = require("fs");
 const path = require("path");
+const { describeCall } = require("./lib/describe-call");
 
 const network = process.argv[2] || "sepolia";
 const root = path.join(__dirname, "..");
@@ -60,13 +61,9 @@ async function notify(level, title, detail, txHash) {
 }
 
 // ---- Traducción de eventos a alertas ----
-function describeScheduled(data) {
-  try {
-    const call = treasuryIface.parseTransaction({ data });
-    return `${call.name}(${call.args.map((a) => (typeof a === "string" && a.startsWith("0x") && a.length === 42 ? who(a) : String(a))).join(", ")})`;
-  } catch {
-    return "llamada no reconocida";
-  }
+// El destino de la llamada decide con qué ABI se decodifica (spec 006).
+function describeScheduled(target, data) {
+  return describeCall(target, data, { treasury: TREASURY, timelock: TIMELOCK, treasuryIface, timelockIface, who });
 }
 
 function handleLog(log) {
@@ -77,13 +74,24 @@ function handleLog(log) {
   const tx = log.transactionHash;
   switch (parsed.name) {
     // Timelock: alguien quiere cambiar las reglas
-    case "CallScheduled":
+    case "CallScheduled": {
+      const d = describeScheduled(a.target, a.data);
+      if (!d.known) {
+        return notify("critical", "Cambio programado hacia un destino desconocido",
+          `Destino: ${d.destination}\nSelector: ${d.selector}\nSe podrá ejecutar en ${Number(a.delay) / 3600} h. Si no lo reconocés, el guardián debe cancelarlo.`, tx);
+      }
       return notify("critical", "Cambio programado en el timelock",
-        `Acción: ${describeScheduled(a.data)}\nSe podrá ejecutar en ${Number(a.delay) / 3600} h. Si no lo reconocés, el guardián debe cancelarlo.`, tx);
+        `Destino: ${d.destination}\nAcción: ${d.action}\nSe podrá ejecutar en ${Number(a.delay) / 3600} h. Si no lo reconocés, el guardián debe cancelarlo.`, tx);
+    }
     case "Cancelled":
       return notify("warning", "Cambio cancelado en el timelock", `Operación ${a.id.slice(0, 10)}… cancelada.`, tx);
-    case "CallExecuted":
-      return notify("critical", "Cambio ejecutado por el timelock", `Acción: ${describeScheduled(a.data)}`, tx);
+    case "CallExecuted": {
+      const d = describeScheduled(a.target, a.data);
+      if (!d.known) {
+        return notify("critical", "Cambio ejecutado hacia un destino desconocido", `Destino: ${d.destination}\nSelector: ${d.selector}`, tx);
+      }
+      return notify("critical", "Cambio ejecutado por el timelock", `Destino: ${d.destination}\nAcción: ${d.action}`, tx);
+    }
     // Tesorería: emergencia y configuración
     case "Paused":
       return notify("critical", "Tesorería PAUSADA", `Pausada por ${who(a.account)}. Reanudar requiere el timelock (72 h).`, tx);

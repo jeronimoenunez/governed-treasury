@@ -1,6 +1,6 @@
-## Spec 004 — Agente analista (BORRADOR · fase de clarificación)
+## Spec 004 — Agente analista (CLARIFICADA · pendiente de implementación)
 
-Estado: borrador. No se implementa hasta resolver las preguntas abiertas y aprobar la spec.
+Estado: clarificada, pendiente de implementación. Las preguntas abiertas se resolvieron el 2026-10-27 (ver Clarificación). Queda para la v2; la entrega no depende de esto.
 
 **Qué es y qué no es**
 - Es un agente de IA que lee la actividad de la tesorería (eventos y transacciones rechazadas), la explica en castellano, detecta patrones de riesgo y propone acciones para que las decida una persona.
@@ -31,7 +31,14 @@ Estado: borrador. No se implementa hasta resolver las preguntas abiertas y aprob
 3. ¿Cuántas transacciones envenenadas para el red team y quién las envía (red local o Sepolia)?
 4. ¿Entra en la entrega del 27/10 o queda como v2? (la entrega no depende de esto).
 
+## Clarificación (2026-10-27, decidida por el usuario)
+1. **Modelo:** local (Ollama) para empezar, sin API key ni costo por uso. Una API externa queda como opción a futuro, con la key fuera del repo y del frontend. **Sin modelo, no es un agente:** es un analizador de reglas (por ejemplo, detectar fraccionamiento por suma de retiros en una ventana). Esa versión sin modelo es válida, pero no se la llama "agente".
+2. **Dónde corre:** como script junto al monitor (`scripts/agent.js`), con la misma lectura de eventos y sin claves. No va como sección del panel.
+3. **Red team de inyección:** en la red local de Hardhat, no en Sepolia. Las transacciones envenenadas se mandan con cuentas de prueba locales; N se fija en el plan.
+4. **Cuándo:** v2. No entra en la entrega del 27/10.
+
 Validación
-- [ ] Preguntas abiertas resueltas y spec aprobada.
+- [x] Preguntas abiertas resueltas: ver Clarificación (2026-10-27).
+- [ ] Spec aprobada para implementar (pendiente: plan.md con N y el modelo concreto de Ollama).
 - [ ] RF-A1 a RF-A4 con evidencia.
 - [ ] RNF-A4: tabla antes/después con números de corridas reales.

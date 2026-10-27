@@ -1,0 +1,18 @@
+$ node scripts/check-monitor-destino.js
+# 2026-10-27 15:00 UTC · node v22.23.4 · HEAD 2117e2e + cambios sin commitear de la spec 008
+
+    Destino: tesorería (0x027EB81f2cb5686707fF0dF75b9013661F058aD0) · Acción: setLimits(1,2,1,1)
+OK  RF-M1 setLimits hacia la tesorería
+    Destino: timelock (0xFc5D49450BAfBC894D19d40ed43f73B271566Ce9) · Acción: updateDelay(0)
+OK  RF-M2 updateDelay hacia el timelock
+    Destino: timelock (0xFc5D49450BAfBC894D19d40ed43f73B271566Ce9) · Acción: grantRole(0xb09aa5aeb3702cfd50b6b62bc4532604938f21248a27a1d5ca736082b6819cc1, 0x000000000000000000000000000000000000dEaD)
+OK  RF-M2 grantRole(PROPOSER_ROLE) hacia el timelock se atribuye al timelock
+    Destino: 0x1111111111111111111111111111111111111111 · Selector: 0x7eb5da0d (alerta CRÍTICA "destino desconocido")
+OK  RF-M3 destino desconocido
+    Destino: timelock (0xFc5D49450BAfBC894D19d40ed43f73B271566Ce9) · Acción: llamada no reconocida (selector 0x7eb5da0d)
+OK  RF-M4 llamada no reconocida muestra el destino
+OK  RF-M4 la dirección se compara sin distinguir mayúsculas
+
+6 casos OK
+
+# código de salida: 0
