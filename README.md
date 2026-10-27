@@ -1,6 +1,6 @@
 # GovernedTreasury
 
-**Proyecto final del Ethereum Developer Pack (ETH Kipu · Talento Tech). Autor: Jerónimo Núñez. Entrega individual.**
+**Proyecto final del Ethereum Developer Pack (ETH Kipu · Talento Tech). Autor: Jerónimo Núñez.**
 
 [![CI](https://github.com/jeronimoenunez/governed-treasury/actions/workflows/ci.yml/badge.svg)](https://github.com/jeronimoenunez/governed-treasury/actions/workflows/ci.yml)
 
