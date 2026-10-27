@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useConnection } from "wagmi";
 import { TREASURY, SYMBOL } from "../config.js";
 import { fmt, timeLeft, who } from "../lib/format.js";
-import { useTx } from "../lib/tx.jsx";
+import { useTx } from "../lib/useTx.js";
 
 const STATUS = { 1: "Pendiente", 2: "Ejecutada", 3: "Rechazada" };
 

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { isAddress } from "viem";
 import { TREASURY, TOKEN, KNOWN_ROLES, SYMBOL } from "../config.js";
 import { fmt, short, toWei, who } from "../lib/format.js";
-import { useTx } from "../lib/tx.jsx";
+import { useTx } from "../lib/useTx.js";
 
 const TABS = [
   { id: "deposit", label: "Depositar" },
@@ -36,7 +36,7 @@ export default function Operate({ t, connected, blocked }) {
     if (disabled) return;
     let ok = false;
     if (tab === "deposit" && needsApprove) {
-      ok = await run({ label: `Autorizar ${fmt(wei)} ${SYMBOL}`, contract: TOKEN, functionName: "approve", args: [TREASURY.address, wei] });
+      await run({ label: `Autorizar ${fmt(wei)} ${SYMBOL}`, contract: TOKEN, functionName: "approve", args: [TREASURY.address, wei] });
       return; // el depósito queda como segundo paso
     }
     if (tab === "deposit") ok = await run({ label: `Depositar ${fmt(wei)} ${SYMBOL}`, contract: TREASURY, functionName: "deposit", args: [wei] });

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { EXPLORER, SYMBOL, TREASURY } from "../config.js";
 import { dateTime, fmt, who } from "../lib/format.js";
-import { useTx } from "../lib/tx.jsx";
+import { useTx } from "../lib/useTx.js";
 import Icon from "./Icon.jsx";
 
 const ICONS = { deposit: "down", direct: "arrow", dual: "sign", request: "clock", reject: "x" };

@@ -1,5 +1,5 @@
 import { EXPLORER } from "../config.js";
-import { useTx } from "../lib/tx.jsx";
+import { useTx } from "../lib/useTx.js";
 
 const STATUS_TEXT = {
   checking: "Verificando con el contrato…",

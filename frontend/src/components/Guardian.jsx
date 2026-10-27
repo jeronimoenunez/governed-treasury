@@ -2,7 +2,7 @@ import { useState } from "react";
 import { isAddress } from "viem";
 import { TREASURY } from "../config.js";
 import { who } from "../lib/format.js";
-import { useTx } from "../lib/tx.jsx";
+import { useTx } from "../lib/useTx.js";
 
 export default function Guardian({ t }) {
   const { run, current } = useTx();

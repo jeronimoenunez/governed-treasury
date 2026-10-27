@@ -1,12 +1,11 @@
 // Ejecuta transacciones de punta a punta: simula, pide la firma, espera la confirmación
 // y refresca los datos. Lleva el registro de lo hecho en esta sesión.
-import { createContext, useCallback, useContext, useState } from "react";
+import { useCallback, useState } from "react";
 import { useConfig } from "wagmi";
 import { getConnection, simulateContract, waitForTransactionReceipt, writeContract } from "wagmi/actions";
 import { useQueryClient } from "@tanstack/react-query";
 import { describeError } from "./errors.js";
-
-const TxContext = createContext(null);
+import { TxContext } from "./useTx.js";
 
 export function TxProvider({ children }) {
   const config = useConfig();
@@ -47,5 +46,3 @@ export function TxProvider({ children }) {
     <TxContext.Provider value={{ run, current, history, dismiss: () => setCurrent(null) }}>{children}</TxContext.Provider>
   );
 }
-
-export const useTx = () => useContext(TxContext);
