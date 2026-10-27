@@ -102,4 +102,4 @@ La verificación del código fue **en modo lectura**: `contracts/` no se modific
 
 | Punto | Estado | Evidencia |
 |---|---|---|
-| Frontend desplegado públicamente | ⏳ (opcional) | No está desplegado. Figura en el Roadmap (Vercel) |
+| Frontend desplegado públicamente | ✅ | [governedtreasury.jeronimonunez.com](https://governedtreasury.jeronimonunez.com), linkeado en `README.md:5`. Responde HTTP 200 y el bundle publicado apunta a la tesorería de Sepolia (`0x027EB81f…8aD0`); consultado el 2026-10-27 |

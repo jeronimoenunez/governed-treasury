@@ -2,7 +2,7 @@
 
 **Proyecto final del Ethereum Developer Pack (ETH Kipu · Talento Tech). Autor: Jerónimo Núñez.**
 
-[![CI](https://github.com/jeronimoenunez/governed-treasury/actions/workflows/ci.yml/badge.svg)](https://github.com/jeronimoenunez/governed-treasury/actions/workflows/ci.yml)
+[![CI](https://github.com/jeronimoenunez/governed-treasury/actions/workflows/ci.yml/badge.svg)](https://github.com/jeronimoenunez/governed-treasury/actions/workflows/ci.yml) · **Panel en vivo:** [governedtreasury.jeronimonunez.com](https://governedtreasury.jeronimonunez.com)
 
 Tesorería on-chain de tokens ERC-20 simulando los controles internos que tiene cualquier banco: quien pide un pago no es quien lo aprueba, los montos grandes llevan doble firma, hay topes por operación y por día, solo se paga a destinos agendados y cualquier cambio de reglas espera 72 horas a la vista de todos. El problema que resuelve es el de los contratos con `onlyOwner`: ahí una sola clave puede vaciar la bóveda o cambiar las reglas en una transacción, sin segunda firma, sin espera y sin que nadie pueda frenarla. Si roban esa clave, se pierde todo. Acá no existe esa clave: ninguna cuenta sola puede vaciar la bóveda ni ampliar las reglas al instante. Ampliar permisos espera 72 h a la vista y en ese lapso el guardián lo puede cancelar; restringir (pausar, revocar un destino) sí es inmediato. Si nadie cancela, el cambio se aplica: ver [Riesgos conocidos](#riesgos-conocidos-lo-que-no-cubre).
 
