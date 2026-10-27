@@ -1,6 +1,6 @@
 # GovernedTreasury: una tesorería con controles de banco que no depende de confiar en nadie
 
-**Autor:** Jerónimo Núñez · Proyecto final del Ethereum Developer Pack (ETH Kipu · Talento Tech) · Entrega individual · Octubre de 2026
+**Autor:** Jerónimo Núñez · Proyecto final del Ethereum Developer Pack (ETH Kipu · Talento Tech) · Octubre de 2026
 
 **Repositorio:** [github.com/jeronimoenunez/governed-treasury](https://github.com/jeronimoenunez/governed-treasury) · **Contrato verificado:** [GovernedTreasury en Etherscan (Sepolia)](https://sepolia.etherscan.io/address/0x027EB81f2cb5686707fF0dF75b9013661F058aD0#code)
 

@@ -77,7 +77,7 @@ La verificación del código fue **en modo lectura**: `contracts/` no se modific
 | Punto | Estado | Evidencia |
 |---|---|---|
 | Repo público | ✅ | `api.github.com/repos/jeronimoenunez/governed-treasury` → `"visibility": "public"` (consultado el 2026-10-27) |
-| Al menos un commit de cada integrante (individual) | ✅ | `git log`: 3 commits de Jerónimo Núñez |
+| Al menos un commit de cada integrante (individual) | ✅ | `git log` hasta `8d0f382`: 8 commits, todos de Jerónimo Núñez (6 desde la terminal y 2 desde la web de GitHub, firmados como "Jeronimo E. Nuñez") |
 | Sin private keys, mnemonics ni API keys | ✅ | grep sobre todos los archivos versionados y nuevos: solo marcadores `0x...` de `.env.example`. Los hex de 64 caracteres son hashes de tx públicos de `sepolia-interactions.json`, el hash de `PROPOSER_ROLE` y una semilla de fuzzing. `.env` está en `.gitignore` |
 | `.env.example` | ✅ | `.env.example` |
 | Compila sin warnings relevantes sin analizar | ✅ | `npx hardhat compile --force`: 5 warnings, todos de `node_modules/@openzeppelin/contracts/utils/TransientSlot.sol` (uso de `tstore`). El mismo mensaje del compilador dice que usarlo para un guard de reentrancy que se limpia al terminar la llamada es seguro, y ese es el caso de `ReentrancyGuardTransient`. Contratos propios: 0 warnings |
