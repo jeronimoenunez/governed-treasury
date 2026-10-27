@@ -315,7 +315,7 @@ Las direcciones y ABI que usa el panel ya están en `frontend/src/contracts/`. S
 
 ## Cómo se trabajó con IA
 
-La IA asistió en todo el proyecto: borradores del contrato, tests, PoCs, scripts, panel y documentación; las decisiones de diseño, el deploy, las pruebas en Sepolia y la validación las hice yo. Usé un agente de código (Claude Code) y, para que no improvisara, trabajé con reglas escritas:
+La IA asistió en una parte del proyecto: borradores iniciales del contrato, tests, PoCs, scripts, panel y documentación; las decisiones finales de diseño de contratos, tests, scripts, panel, documentacion, revision, el deploy, las pruebas en Sepolia y la validación las hice manualmente. Usé un agente de código (Claude Code) y, para que no improvisara, trabajé con reglas escritas:
 
 - **Spec primero.** Ninguna funcionalidad se implementa sin una spec aprobada en [`specs/`](specs/constitucion.md): primero los requisitos con su criterio de aceptación, después el plan y recién ahí el código. El agente propone; yo apruebo o corrijo.
 - **[`AGENTS.md`](AGENTS.md)** fija lo que no se negocia: los contratos desplegados no se tocan, nada corre contra Sepolia sin confirmación, no se hacen commits ni push sin pedirlo.
