@@ -1,0 +1,39 @@
+# CI de GovernedTreasury (spec 005). Corre los tests de Hardhat y de Foundry
+# en una máquina limpia. No deploya, no toca Sepolia y no usa secretos:
+# hardhat.config.js carga igual sin .env (la red sepolia queda vacía).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Mínimo privilegio: el token del job solo puede leer el código.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # Instala exactamente lo que dice package-lock.json (incluido forge-std).
+      - run: npm ci
+
+      # 29 tests unitarios y de ataque, en la red local en memoria de Hardhat.
+      - run: npx hardhat test
+
+      # Versión fija del stack. forge baja el solc 0.8.24 que pide foundry.toml.
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: v1.7.1
+
+      # Fuzzing e invariantes de test-foundry/. No se usa `npm run fuzz`
+      # porque ese script apunta al solc de Hardhat en macOS.
+      - run: forge test

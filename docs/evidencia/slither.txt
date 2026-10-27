@@ -1,0 +1,20 @@
+$ npm run slither
+# 2026-10-27 13:16 UTC · node v22.23.4
+# slither --version: 0.11.6 · El código de salida 255 viene con el hallazgo reportado; la salida no muestra errores de compilación ni de análisis.
+
+
+> governed-treasury@1.0.0 slither
+> slither . --compile-force-framework hardhat --filter-paths "node_modules|mocks|test-foundry"
+
+'npx hardhat clean' running (wd: /Users/jeronimonunez/proyectos/talento-tech/governed-treasury)
+'npx hardhat clean --global' running (wd: /Users/jeronimonunez/proyectos/talento-tech/governed-treasury)
+'npx hardhat compile --force' running (wd: /Users/jeronimonunez/proyectos/talento-tech/governed-treasury)
+INFO:Detectors:
+Detector: timestamp
+GovernedTreasury.approveWithdrawal(uint256) (contracts/GovernedTreasury.sol#329-348) uses timestamp for comparisons
+	Dangerous comparisons:
+	- block.timestamp > req.expiresAt (contracts/GovernedTreasury.sol#337)
+Reference: https://github.com/crytic/slither/wiki/Detector-Documentation#block-timestamp
+INFO:Slither:. analyzed (30 contracts with 102 detectors), 1 result(s) found
+
+# código de salida: 255

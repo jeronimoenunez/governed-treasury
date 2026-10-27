@@ -1,0 +1,137 @@
+$ npm run test:gas
+# 2026-10-27 13:16 UTC · node v22.23.4
+
+
+> governed-treasury@1.0.0 test:gas
+> REPORT_GAS=true hardhat test
+
+Warning: Transient storage as defined by EIP-1153 can break the composability of smart contracts: Since transient storage is cleared only at the end of the transaction and not at the end of the outermost call frame to the contract within a transaction, your contract may unintentionally misbehave when invoked multiple times in a complex transaction. To avoid this, be sure to clear all transient storage at the end of any call to your contract. The use of transient storage for reentrancy guards that are cleared at the end of the call is safe.
+   --> @openzeppelin/contracts/utils/TransientSlot.sol:108:13:
+    |
+108 |             tstore(slot, value)
+    |             ^^^^^^
+
+
+Warning: Transient storage as defined by EIP-1153 can break the composability of smart contracts: Since transient storage is cleared only at the end of the transaction and not at the end of the outermost call frame to the contract within a transaction, your contract may unintentionally misbehave when invoked multiple times in a complex transaction. To avoid this, be sure to clear all transient storage at the end of any call to your contract. The use of transient storage for reentrancy guards that are cleared at the end of the call is safe.
+   --> @openzeppelin/contracts/utils/TransientSlot.sol:126:13:
+    |
+126 |             tstore(slot, value)
+    |             ^^^^^^
+
+
+Warning: Transient storage as defined by EIP-1153 can break the composability of smart contracts: Since transient storage is cleared only at the end of the transaction and not at the end of the outermost call frame to the contract within a transaction, your contract may unintentionally misbehave when invoked multiple times in a complex transaction. To avoid this, be sure to clear all transient storage at the end of any call to your contract. The use of transient storage for reentrancy guards that are cleared at the end of the call is safe.
+   --> @openzeppelin/contracts/utils/TransientSlot.sol:144:13:
+    |
+144 |             tstore(slot, value)
+    |             ^^^^^^
+
+
+Warning: Transient storage as defined by EIP-1153 can break the composability of smart contracts: Since transient storage is cleared only at the end of the transaction and not at the end of the outermost call frame to the contract within a transaction, your contract may unintentionally misbehave when invoked multiple times in a complex transaction. To avoid this, be sure to clear all transient storage at the end of any call to your contract. The use of transient storage for reentrancy guards that are cleared at the end of the call is safe.
+   --> @openzeppelin/contracts/utils/TransientSlot.sol:162:13:
+    |
+162 |             tstore(slot, value)
+    |             ^^^^^^
+
+
+Warning: Transient storage as defined by EIP-1153 can break the composability of smart contracts: Since transient storage is cleared only at the end of the transaction and not at the end of the outermost call frame to the contract within a transaction, your contract may unintentionally misbehave when invoked multiple times in a complex transaction. To avoid this, be sure to clear all transient storage at the end of any call to your contract. The use of transient storage for reentrancy guards that are cleared at the end of the call is safe.
+   --> @openzeppelin/contracts/utils/TransientSlot.sol:180:13:
+    |
+180 |             tstore(slot, value)
+    |             ^^^^^^
+
+
+Compiled 29 Solidity files successfully (evm target: cancun).
+
+  GovernedTreasury
+    Despliegue
+      ✔ reparte los roles y el deployer no se queda con ninguno
+      ✔ rechaza configuraciones inválidas en el constructor
+    Depósito
+      ✔ acepta depósitos y emite Deposited
+      ✔ rechaza monto cero
+    Retiro directo (sin doble firma)
+      ✔ el operador retira un monto chico hacia un beneficiario habilitado
+      ✔ exige doble firma desde el umbral
+      ✔ rechaza monto cero
+    ATAQUE: control de acceso
+      ✔ una cuenta sin rol no puede retirar
+      ✔ el operador no puede aprobar y el aprobador no puede pedir
+      ✔ nadie cambia la configuración sin pasar por el timelock
+    ATAQUE: destinos y límites
+      ✔ no se puede enviar a una dirección fuera de la allowlist
+      ✔ fraccionar retiros para evitar la doble firma queda bloqueado
+      ✔ respeta el tope diario general (con error propio, no panic) y se renueva al día siguiente
+      ✔ rechaza montos sobre el límite por operación
+      ✔ informa lo que queda disponible hoy
+    Doble firma (maker-checker)
+      ✔ flujo completo: el operador pide, el aprobador firma y se ejecuta
+      ✔ los montos chicos van por el retiro directo
+      ✔ ATAQUE: quien pide no puede aprobar su propio pedido
+      ✔ ATAQUE: no se puede aprobar dos veces el mismo pedido
+      ✔ una orden vencida no se puede aprobar
+      ✔ se revalida al aprobar: si revocaron al beneficiario, no se paga
+      ✔ rechazan el aprobador, el guardián o el propio solicitante; un tercero no
+    Emergencia: restringir es rápido, ampliar es lento
+      ✔ la pausa bloquea operaciones pero permite rechazar pedidos
+      ✔ el guardián no puede reanudar: eso pasa por el timelock
+      ✔ el guardián revoca beneficiarios al instante pero no puede habilitarlos
+    ATAQUE: admin comprometido vs timelock
+      ✔ un cambio no se puede ejecutar antes de 72 horas
+      ✔ el guardián cancela un cambio sospechoso durante la espera
+      ✔ pasadas las 72 horas, los cambios legítimos se aplican
+    ATAQUE: reentrancy
+      ✔ un token malicioso que intenta reentrar es bloqueado por nonReentrant
+
+·--------------------------------------------|---------------------------|-------------|-----------------------------·
+|            Solc version: 0.8.24            ·  Optimizer enabled: true  ·  Runs: 200  ·  Block limit: 60000000 gas  │
+·············································|···························|·············|······························
+|  Methods                                                                                                           │
+·······················|·····················|·············|·············|·············|···············|··············
+|  Contract            ·  Method             ·  Min        ·  Max        ·  Avg        ·  # calls      ·  usd (avg)  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  GovernanceTimelock  ·  cancel             ·          -  ·          -  ·      25956  ·            1  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  GovernanceTimelock  ·  execute            ·      44453  ·      71349  ·      60447  ·            4  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  GovernanceTimelock  ·  grantRole          ·          -  ·          -  ·      51508  ·            1  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  GovernanceTimelock  ·  renounceRole       ·          -  ·          -  ·      24623  ·            1  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  GovernanceTimelock  ·  schedule           ·      55445  ·      58173  ·      56700  ·            6  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  GovernedTreasury    ·  approveWithdrawal  ·      65771  ·      99959  ·      88564  ·            9  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  GovernedTreasury    ·  deposit            ·      37699  ·      54635  ·      43344  ·            3  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  GovernedTreasury    ·  pause              ·          -  ·          -  ·      47053  ·            2  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  GovernedTreasury    ·  rejectWithdrawal   ·      30634  ·      33119  ·      32218  ·            6  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  GovernedTreasury    ·  requestWithdrawal  ·      85750  ·     102850  ·      97150  ·           15  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  GovernedTreasury    ·  revokeBeneficiary  ·          -  ·          -  ·      26049  ·            3  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  GovernedTreasury    ·  withdraw           ·      57155  ·      91355  ·      84515  ·            5  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  MaliciousToken      ·  mint               ·          -  ·          -  ·      68574  ·            1  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  MaliciousToken      ·  setTarget          ·          -  ·          -  ·      66575  ·            1  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  MockToken           ·  approve            ·      46367  ·      46379  ·      46373  ·            2  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  MockToken           ·  mint               ·      53603  ·      70715  ·      62159  ·            2  ·          -  │
+·······················|·····················|·············|·············|·············|···············|··············
+|  Deployments                               ·                                         ·  % of limit   ·             │
+·············································|·············|·············|·············|···············|··············
+|  GovernanceTimelock                        ·          -  ·          -  ·    1631005  ·        2.7 %  ·          -  │
+·············································|·············|·············|·············|···············|··············
+|  GovernedTreasury                          ·          -  ·          -  ·    1723506  ·        2.9 %  ·          -  │
+·············································|·············|·············|·············|···············|··············
+|  MaliciousToken                            ·          -  ·          -  ·     628955  ·          1 %  ·          -  │
+·············································|·············|·············|·············|···············|··············
+|  MockToken                                 ·          -  ·          -  ·     607148  ·          1 %  ·          -  │
+·--------------------------------------------|-------------|-------------|-------------|---------------|-------------·
+
+  29 passing (347ms)
+
+# código de salida: 0

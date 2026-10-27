@@ -1,0 +1,118 @@
+$ npm run fuzz
+# 2026-10-27 13:16 UTC · node v22.23.4
+
+
+> governed-treasury@1.0.0 fuzz
+> forge test --use ~/Library/Caches/hardhat-nodejs/compilers-v2/macosx-amd64/solc-macosx-amd64-v0.8.24+commit.e11b9ed9 --offline
+
+No files changed, compilation skipped
+
+Ran 4 tests for test-foundry/GovernedTreasury.fuzz.t.sol:GovernedTreasuryFuzzTest
+[PASS] testFuzz_DestinoNoAgendadoSiempreRechazado(address,uint256) (runs: 1000, μ: 29671, ~: 29889)
+[PASS] testFuzz_FraccionarNoSuperaElTopeDirecto(uint256[12]) (runs: 1000, μ: 198177, ~: 198253)
+[PASS] testFuzz_PedidoRespetaUmbralYLimite(uint256) (runs: 1000, μ: 32457, ~: 26951)
+[PASS] testFuzz_SinRolNoSePuedeRetirar(address,uint256) (runs: 1000, μ: 19924, ~: 20142)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 49.40ms (141.29ms CPU time)
+
+Ran 4 tests for test-foundry/GovernedTreasury.invariant.t.sol:GovernedTreasuryInvariantTest
+[PASS] invariant_ConservacionDeFondos() (runs: 256, calls: 12800, reverts: 0)
+
+╭----------+----------------------+-------+---------+----------╮
+| Contract | Selector             | Calls | Reverts | Discards |
++==============================================================+
+| Handler  | approve              | 1430  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | attackerWithdraws    | 1435  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | dualSelfApproves     | 1398  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | operatorPaysAttacker | 1398  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | operatorSelfApproves | 1432  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | passTime             | 1479  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | reject               | 1459  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | request              | 1428  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | withdraw             | 1341  | 0       | 0        |
+╰----------+----------------------+-------+---------+----------╯
+
+[PASS] invariant_NingunAtaqueFunciona() (runs: 256, calls: 12800, reverts: 0)
+
+╭----------+----------------------+-------+---------+----------╮
+| Contract | Selector             | Calls | Reverts | Discards |
++==============================================================+
+| Handler  | approve              | 1430  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | attackerWithdraws    | 1435  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | dualSelfApproves     | 1398  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | operatorPaysAttacker | 1398  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | operatorSelfApproves | 1432  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | passTime             | 1479  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | reject               | 1459  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | request              | 1428  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | withdraw             | 1341  | 0       | 0        |
+╰----------+----------------------+-------+---------+----------╯
+
+[PASS] invariant_SoloElTimelockEsAdmin() (runs: 256, calls: 12800, reverts: 0)
+
+╭----------+----------------------+-------+---------+----------╮
+| Contract | Selector             | Calls | Reverts | Discards |
++==============================================================+
+| Handler  | approve              | 1430  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | attackerWithdraws    | 1435  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | dualSelfApproves     | 1398  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | operatorPaysAttacker | 1398  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | operatorSelfApproves | 1432  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | passTime             | 1479  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | reject               | 1459  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | request              | 1428  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | withdraw             | 1341  | 0       | 0        |
+╰----------+----------------------+-------+---------+----------╯
+
+[PASS] invariant_TopesDiarios() (runs: 256, calls: 12800, reverts: 0)
+
+╭----------+----------------------+-------+---------+----------╮
+| Contract | Selector             | Calls | Reverts | Discards |
++==============================================================+
+| Handler  | approve              | 1430  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | attackerWithdraws    | 1435  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | dualSelfApproves     | 1398  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | operatorPaysAttacker | 1398  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | operatorSelfApproves | 1432  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | passTime             | 1479  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | reject               | 1459  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | request              | 1428  | 0       | 0        |
+|----------+----------------------+-------+---------+----------|
+| Handler  | withdraw             | 1341  | 0       | 0        |
+╰----------+----------------------+-------+---------+----------╯
+
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 813.58ms (2.77s CPU time)
+
+Ran 2 test suites in 821.57ms (862.98ms CPU time): 8 tests passed, 0 failed, 0 skipped (8 total tests)
+
+# código de salida: 0

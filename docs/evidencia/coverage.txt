@@ -1,0 +1,91 @@
+$ npm run coverage
+# 2026-10-27 13:16 UTC · node v22.23.4
+
+
+> governed-treasury@1.0.0 coverage
+> hardhat coverage
+
+
+Version
+=======
+> solidity-coverage: v0.8.17
+
+Instrumenting for coverage...
+=============================
+
+> GovernanceTimelock.sol
+> GovernedTreasury.sol
+> mocks/MaliciousToken.sol
+> MockToken.sol
+
+Compilation:
+============
+
+Compiled 29 Solidity files successfully (evm target: cancun).
+
+Network Info
+============
+> HardhatEVM: v2.29.1
+> network:    hardhat
+
+
+
+  GovernedTreasury
+    Despliegue
+      ✔ reparte los roles y el deployer no se queda con ninguno (49ms)
+      ✔ rechaza configuraciones inválidas en el constructor
+    Depósito
+      ✔ acepta depósitos y emite Deposited
+      ✔ rechaza monto cero
+    Retiro directo (sin doble firma)
+      ✔ el operador retira un monto chico hacia un beneficiario habilitado
+      ✔ exige doble firma desde el umbral
+      ✔ rechaza monto cero
+    ATAQUE: control de acceso
+      ✔ una cuenta sin rol no puede retirar
+      ✔ el operador no puede aprobar y el aprobador no puede pedir
+      ✔ nadie cambia la configuración sin pasar por el timelock
+    ATAQUE: destinos y límites
+      ✔ no se puede enviar a una dirección fuera de la allowlist
+      ✔ fraccionar retiros para evitar la doble firma queda bloqueado
+      ✔ respeta el tope diario general (con error propio, no panic) y se renueva al día siguiente
+      ✔ rechaza montos sobre el límite por operación
+      ✔ informa lo que queda disponible hoy
+    Doble firma (maker-checker)
+      ✔ flujo completo: el operador pide, el aprobador firma y se ejecuta
+      ✔ los montos chicos van por el retiro directo
+      ✔ ATAQUE: quien pide no puede aprobar su propio pedido
+      ✔ ATAQUE: no se puede aprobar dos veces el mismo pedido
+      ✔ una orden vencida no se puede aprobar
+      ✔ se revalida al aprobar: si revocaron al beneficiario, no se paga
+      ✔ rechazan el aprobador, el guardián o el propio solicitante; un tercero no
+    Emergencia: restringir es rápido, ampliar es lento
+      ✔ la pausa bloquea operaciones pero permite rechazar pedidos
+      ✔ el guardián no puede reanudar: eso pasa por el timelock
+      ✔ el guardián revoca beneficiarios al instante pero no puede habilitarlos
+    ATAQUE: admin comprometido vs timelock
+      ✔ un cambio no se puede ejecutar antes de 72 horas
+      ✔ el guardián cancela un cambio sospechoso durante la espera
+      ✔ pasadas las 72 horas, los cambios legítimos se aplican
+    ATAQUE: reentrancy
+      ✔ un token malicioso que intenta reentrar es bloqueado por nonReentrant
+
+
+  29 passing (252ms)
+
+-------------------------|----------|----------|----------|----------|----------------|
+File                     |  % Stmts | % Branch |  % Funcs |  % Lines |Uncovered Lines |
+-------------------------|----------|----------|----------|----------|----------------|
+ contracts/              |      100 |    74.47 |      100 |      100 |                |
+  GovernanceTimelock.sol |      100 |      100 |      100 |      100 |                |
+  GovernedTreasury.sol   |      100 |       75 |      100 |      100 |                |
+  MockToken.sol          |      100 |       50 |      100 |      100 |                |
+ contracts/mocks/        |      100 |      100 |      100 |      100 |                |
+  MaliciousToken.sol     |      100 |      100 |      100 |      100 |                |
+-------------------------|----------|----------|----------|----------|----------------|
+All files                |      100 |       75 |      100 |      100 |                |
+-------------------------|----------|----------|----------|----------|----------------|
+
+> Istanbul reports written to ./coverage/ and ./coverage.json
+
+# código de salida: 0
