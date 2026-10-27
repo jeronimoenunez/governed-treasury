@@ -2,6 +2,8 @@
 
 **Autor:** Jerónimo Núñez · Proyecto final del Ethereum Developer Pack (ETH Kipu · Talento Tech) · Entrega individual · Octubre de 2026
 
+**Repositorio:** [github.com/jeronimoenunez/governed-treasury](https://github.com/jeronimoenunez/governed-treasury) · **Contrato verificado:** [GovernedTreasury en Etherscan (Sepolia)](https://sepolia.etherscan.io/address/0x027EB81f2cb5686707fF0dF75b9013661F058aD0#code)
+
 ## 1. El problema
 
 Toda organización que maneja dinero termina armando las mismas reglas. Quien pide un pago no es quien lo aprueba. Los montos grandes necesitan una segunda firma. Hay un máximo por operación y otro por día. Solo se le paga a proveedores que ya están dados de alta. Y si alguien quiere cambiar esas reglas, el cambio no puede aplicarse de un minuto para el otro. Los bancos lo llaman control interno, y existe porque el riesgo más común no es un ladrón de afuera: es una persona de adentro que se equivoca, o una cuenta que alguien roba.

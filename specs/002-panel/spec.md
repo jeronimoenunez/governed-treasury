@@ -28,4 +28,4 @@ Extiende `001-frontend`. Misma constitución: el frontend no modifica los contra
 ## Validación
 
 - [ ] Local (Hardhat): panel completo con actividad de varios días. Motivo: no hay captura ni registro de una corrida local con actividad de varios días (ver `retro.md`).
-- [ ] Sepolia: los gráficos muestran los movimientos reales del contrato verificado. Motivo: en `docs/panel.png` los gráficos de movimientos todavía dicen "Leyendo el historial de la cadena…"; falta una captura con el historial cargado.
+- [x] Sepolia: los gráficos muestran los movimientos reales del contrato verificado. `docs/panel.png` (captura nueva del 2026-10-27, bloque 12.006.541, cuenta del guardián) muestra el saldo en el tiempo, entradas y salidas de los últimos 7 días (entró 10.000, salió 1.260), el tope diario usado (500 de 3.000) y la operación cancelada del timelock. Los números cierran con la cadena: `balanceOf` de la tesorería dio 8.740 con la RPC pública el 2026-10-27, y las salidas son 100 + 600 de `scripts/interact.js` más 50 + 10 + 500 desde el panel.

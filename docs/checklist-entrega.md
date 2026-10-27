@@ -1,6 +1,6 @@
 # Checklist de entrega — GovernedTreasury
 
-Autor: Jerónimo Núñez · entrega individual · revisado el 2026-10-27.
+Autor: Jerónimo Núñez · revisado el 2026-10-27.
 
 Leyenda: ✅ cumple, con evidencia · ⚠️ cumple en parte o con una salvedad explicada · ❌ no cumple · ⏳ pendiente (lo hace el autor).
 

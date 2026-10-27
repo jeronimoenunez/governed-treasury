@@ -1,4 +1,4 @@
-# Governed Treasury (Boveda Gobernada)
+# Governed Treasury (Bóveda Gobernada)
 
 **Proyecto final del Ethereum Developer Pack (ETH Kipu · Talento Tech). Autor: Jerónimo Núñez.**
 
