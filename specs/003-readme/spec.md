@@ -31,7 +31,7 @@ Que quien vea y evalúe entienda rápidamente qué es el proyecto, qué controle
 
 - **RF-R12	Cómo correrlo:**	Pasos desde git clone hasta tests, monitor y frontend. Variables según .env.example, sin valores, incluidas las del monitor (SLACK_WEBHOOK_URL, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, MONITOR_POLL_MS=6000) con los nombres de scripts/monitor.js. Aclara que npm run fuzz usa el solc de Hardhat en macOS y que en otra máquina se corre forge test con Foundry instalado.
 
-- **RF-R13	Roadmap:**	Multi-firma/Safe, límites por beneficiario, referencia de factura, agente de IA de solo lectura (spec 004), rotación de claves, Vercel.
+- **RF-R13	Roadmap:**	Multi-firma/Safe, límites por beneficiario, referencia de factura, agente de IA de solo lectura (spec 004), rotación de claves. El deploy del panel ya no figura: está hecho en Cloudflare Pages y el link va arriba del README, como "Panel en vivo" (cambio del 2026-10-27).
 
 - **RF-R14	Captura del panel:**	Debajo del primer párrafo se ve docs/panel.png.
 
@@ -55,4 +55,5 @@ Que quien vea y evalúe entienda rápidamente qué es el proyecto, qué controle
 - [x] RNF-R1: corridas del 2026-10-27 con salidas completas en `docs/evidencia/` (sin códigos ANSI, verificado con grep). Coverage, gas y Slither: corrida de las 13:16 UTC (contratos y `test/` sin cambios desde entonces): 100 % stmts/funcs/lines, 75 % branch · deploy GovernedTreasury 1.723.506 · Slither 1 hallazgo (`timestamp`, aceptado). `npm test` y `npm run fuzz`: corrida nueva después de la spec 008, con 29 passing y 14 passed (4 fuzz, 4 invariantes, 5 PoC y 1 de sanidad). El README tiene esos mismos números.
 - [x] RNF-R2: grep de RNF-R2 sobre README.md, docs/ (evidencia, auditoría, checklist, whitepaper) y los archivos nuevos: sin secretos. Las únicas coincidencias de `_KEY=` en el repo son los marcadores `0x...` de `.env.example` y el patrón citado en esta spec. Los hex de 64 caracteres son hashes de tx públicos, el hash de `PROPOSER_ROLE` y una semilla de fuzzing (2026-10-27).
 - [x] RNF-R4: links comprobados el 2026-10-27 con un script que valida rutas y anclas: 43 links internos del README, 0 rotos (incluye `docs/panel.png`, que ahora existe, y las anclas `#riesgos-conocidos-lo-que-no-cubre`, `#evidencia-en-sepolia` y `#gas--npm-run-testgas`). Los documentos enlazados (auditoría, checklist, whitepaper, spec 007, retro): 18 links, 0 rotos. Para que funcionen en GitHub hay que commitear los archivos nuevos.
+- [x] RF-R13 (cambio del 2026-10-27): la fila "Deploy del panel en Vercel" salió del Roadmap; `grep -n Vercel README.md` da vacío. "Panel en vivo" está en `README.md:5`.
 - [x] RF-R16: correcciones (a), tabla de riesgos con fix v2 (b), ahora con IDs GT-0X y columna PoC, y aclaración de la invariante (c), actualizada porque la spec 008 la corrigió. `git diff --stat contracts/` vacío. Aprobado por el usuario el 2026-10-27.

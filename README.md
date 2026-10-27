@@ -335,4 +335,3 @@ El agente acelera la escritura y la revisión. No reemplaza entender el código:
 | Referencia de factura en cada retiro | Atar cada pago a un comprobante para conciliar y auditar |
 | Agente de IA de solo lectura | Que explique la actividad y detecte patrones de riesgo sin claves ni firma. Clarificada, para la v2: [spec 004](specs/004-agente-analista/spec.md) |
 | Rotación de claves | Procedimiento para reemplazar una cuenta de rol comprometida vía timelock: [spec 007](specs/007-safe-y-rotacion/spec.md) |
-| Deploy del panel en Vercel | Que cualquiera lo abra sin clonar el repo |
