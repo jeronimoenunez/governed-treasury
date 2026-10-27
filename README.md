@@ -202,6 +202,19 @@ Slither 0.11.6: 30 contratos analizados con 102 detectores, **1 hallazgo**. Sali
 
 Las rechazadas quedan registradas en la cadena con estado *Fail*: el contrato las revirtió y no movieron nada.
 
+### Operaciones desde el panel
+
+Hechas desde el [panel web](#panel-web) en Sepolia, firmando con MetaMask, cada una con la cuenta de su rol (`deployments/sepolia.json`). Verificadas el 2026-10-27 con la RPC pública: la transacción existe, va a la tesorería `0x027EB81f…8aD0`, el método y el remitente coinciden y el estado es *success*.
+
+| # | Rol | Operación | Fecha (UTC) | Tx |
+|---|---|---|---|---|
+| 1 | Operador | Retiro directo de 50 (`withdraw`) | 2026-10-26 13:52 | [ver](https://sepolia.etherscan.io/tx/0xb244f26edf9298bee919167308166bb137001bc669e9257f267ee8afebc1472e) |
+| 2 | Operador | Retiro directo de 10 (`withdraw`) | 2026-10-26 21:22 | [ver](https://sepolia.etherscan.io/tx/0xbc6530d6c8212ebe25d7eb801b53aedbb264b48f4d5f8708e234c755de5131b7) |
+| 3 | Operador | Pide retiro de 500, Pedido 2 (`requestWithdrawal`) | 2026-10-26 21:24 | [ver](https://sepolia.etherscan.io/tx/0x2ea4027643f9afdc50a1499d71f7b1295e537fc42eb7681f9c04ce6f46a309ae) |
+| 4 | Aprobador | Aprueba el Pedido 2: doble firma y pago (`approveWithdrawal`) | 2026-10-27 16:50 | [ver](https://sepolia.etherscan.io/tx/0x756e902c146bb233dbe2860c7825bb70231a9ab5a7b2c3e5b2ad65cdd66a0fcd) |
+| 5 | Operador | Pide retiro de 500, Pedido 3 (`requestWithdrawal`) | 2026-10-27 16:56 | [ver](https://sepolia.etherscan.io/tx/0x2ffc52b48598cd4d3c69f067f071c1f3bd876e9caee20a95dfec77bfc0ac22e9) |
+| 6 | Guardián | Rechaza el Pedido 3 (`rejectWithdrawal`) | 2026-10-27 16:58 | [ver](https://sepolia.etherscan.io/tx/0x26f4a7f01829a34f7faa7b1b31755aa9b5716440fc096f8e3a39c116af7030fa) |
+
 ## Decisiones de diseño
 
 | Decisión | Por qué |
@@ -296,11 +309,13 @@ npm install
 npm run dev
 ```
 
+Si el RPC público por defecto limita las consultas ("Request exceeds defined limit"), configurá uno propio en `frontend/.env.local` con `VITE_RPC_URL` (ver [`frontend/.env.example`](frontend/.env.example)). Nunca uses una URL con API key si el panel se publica: las variables `VITE_` quedan dentro del JavaScript que descarga cualquiera.
+
 Las direcciones y ABI que usa el panel ya están en `frontend/src/contracts/`. Si se vuelve a deployar, se regeneran con `node scripts/export-frontend.js sepolia`.
 
 ## Cómo se trabajó con IA
 
-La IA asistió en todo el proyecto: en los borradores del contrato, los tests, los scripts, el panel y la documentación. Usé un agente de código (Claude Code). Las decisiones de diseño, el deploy, las pruebas en Sepolia y la validación final las hice yo. Para que el agente no improvisara, trabajé con reglas escritas:
+La IA asistió en todo el proyecto: borradores del contrato, tests, PoCs, scripts, panel y documentación; las decisiones de diseño, el deploy, las pruebas en Sepolia y la validación las hice yo. Usé un agente de código (Claude Code) y, para que no improvisara, trabajé con reglas escritas:
 
 - **Spec primero.** Ninguna funcionalidad se implementa sin una spec aprobada en [`specs/`](specs/constitucion.md): primero los requisitos con su criterio de aceptación, después el plan y recién ahí el código. El agente propone; yo apruebo o corrijo.
 - **[`AGENTS.md`](AGENTS.md)** fija lo que no se negocia: los contratos desplegados no se tocan, nada corre contra Sepolia sin confirmación, no se hacen commits ni push sin pedirlo.

@@ -1,7 +1,8 @@
 ## Spec 003 — README del repositorio
 
 **Objetivo**
-Que quien evalúe entienda rápidamente qué es el proyecto, qué controles tiene y cómo comprobar que funcionan, sin tener que creerle a nadie.
+
+Que quien vea y evalúe entienda rápidamente qué es el proyecto, qué controles tiene y cómo comprobar que funcionan, sin tener que creerle a nadie.
 
 ## Requerimientos funcionales
 

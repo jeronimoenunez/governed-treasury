@@ -23,14 +23,14 @@ La verificación del código fue **en modo lectura**: `contracts/` no se modific
 
 | Punto | Estado | Evidencia |
 |---|---|---|
-| NatSpec: variables de estado | ⚠️ | Todas tienen `@notice` (líneas 69-97). A los getters de las variables públicas les falta `@return`: solc (`--devdoc`) no registra `returns` para los 10 getters (`token`, `limits`, `requests`, etc.). Los campos de los structs se documentan con comentarios en línea (líneas 32-63), no con etiquetas |
+| NatSpec: variables de estado | ⚠️ | Todas tienen `@notice` (líneas 69-97). A los getters de las variables públicas les falta `@return`: solc (`--devdoc`) no registra `returns` para los 10 getters (`token`, `limits`, `requests`, etc.). Los campos de los structs se documentan con comentarios en línea (líneas 32-63), no con etiquetas. No se agregan ahora: los comentarios entran en la metadata del compilado, cambiarlos cambia su hash (que va al final del bytecode) y el contrato dejaría de coincidir con el verificado en Etherscan. Queda para la v2 |
 | NatSpec: eventos y parámetros | ✅ | 7 eventos propios con `@notice` y `@param` (líneas 103-151); comprobado con `solc --devdoc --userdoc` |
 | NatSpec: custom errors y parámetros | ✅ | 15 errores con `@notice` y `@param` (líneas 157-217); comprobado con solc |
 | NatSpec: funciones (descripción, params, returns) | ✅ | Todas las funciones propias tienen descripción, `@param` y `@return` (`requestWithdrawal`, `remainingToday`); las privadas, `@dev` y `@param`. `GovernanceTimelock` y `MockToken`: completos. Comprobado con solc |
 | NatSpec: modifiers | ✅ (no aplica) | No hay modifiers propios. Se usan `onlyRole`, `whenNotPaused` y `nonReentrant` de OpenZeppelin, documentados allí |
 | Custom errors en lugar de strings | ✅ | No hay ningún `require(` ni `revert("…")` en `contracts/` (grep vacío). Todos los reverts son errores con datos |
 | Sin strings/bytes largos innecesarios | ✅ | Solo el nombre y el símbolo de `MockToken` |
-| Sin lecturas/escrituras repetidas a storage | ⚠️ | `withdraw` y `requestWithdrawal` copian `limits` a memoria una vez (líneas 290 y 308). En `approveWithdrawal` se lee `req.requester` dos veces (líneas 338 y 346), y `status`, `expiresAt` y `requester` comparten slot pero se leen por separado. Son lecturas *warm* de 100 gas cada una: ahorro chico, y el contrato desplegado no se toca |
+| Sin lecturas/escrituras repetidas a storage | ⚠️ | `withdraw` y `requestWithdrawal` copian `limits` a memoria una vez (líneas 290 y 308). En `approveWithdrawal` se lee `req.requester` dos veces (líneas 338 y 346), y `status`, `expiresAt` y `requester` comparten slot pero se leen por separado. Son lecturas *warm* de 100 gas cada una: ahorro chico, y el contrato desplegado no se toca. Cachear el pedido en memoria queda como optimización de la v2 |
 | storage/memory/calldata correctos | ✅ | `setLimits(Limits calldata)` (línea 383), puntero `storage` para el pedido en `approveWithdrawal`/`rejectWithdrawal` (líneas 335 y 355), copias a `memory` donde se leen varios campos |
 | constant e immutable cuando corresponde | ✅ | Roles y `REQUEST_TTL` son `constant` (líneas 70-79); `token` es `immutable` (línea 82) |
 | Visibilidad y mutabilidad adecuadas | ✅ | Funciones de entrada `external`; `remainingToday` es `view`; helpers `private` |
@@ -41,7 +41,7 @@ La verificación del código fue **en modo lectura**: `contracts/` no se modific
 | Sin estado ni cálculos innecesarios | ✅ | Estado mínimo: límites, allowlist, gasto por día y pedidos |
 | Nombres claros y estructura auditable | ✅ | Secciones comentadas (tipos, estado, eventos, errores, operación, administración, emergencia, lectura, privadas) |
 | Sin tx.origin, delegatecall, selfdestruct ni assembly innecesarios | ✅ | grep vacío en `contracts/`. El único assembly es el de `TransientSlot` de OpenZeppelin, que usa `ReentrancyGuardTransient` |
-| unchecked cuando es seguro y ahorra gas | ⚠️ | No se usa `unchecked`. El único bucle (constructor, línea 255) usa `++i` con `i < len`; desde Solidity 0.8.22 el compilador ya omite el chequeo de overflow de ese incremento. Quedan restas protegidas por una comparación previa en `remainingToday` (líneas 423-424), que es `view` y no le cuesta gas a nadie en una llamada externa. Ahorro marginal; no se toca el contrato desplegado |
+| unchecked cuando es seguro y ahorra gas | ⚠️ | No se usa `unchecked`. El único bucle (constructor, línea 255) usa `++i` con `i < len`; desde Solidity 0.8.22 el compilador ya omite el chequeo de overflow de ese incremento. Quedan restas protegidas por una comparación previa en `remainingToday` (líneas 423-424), que es `view` y no le cuesta gas a nadie en una llamada externa. Ahorro marginal; no se toca el contrato desplegado. Por eso no hace falta `unchecked`: el compilador ya hace esa optimización desde 0.8.22 |
 | Proxies: inicialización y permisos | ✅ (no aplica) | Sin proxy, por diseño (`README.md`, Decisiones de diseño) |
 
 ## C. Testing
@@ -68,7 +68,7 @@ La verificación del código fue **en modo lectura**: `contracts/` no se modific
 | Punto | Estado | Evidencia |
 |---|---|---|
 | Frontend que interactúa realmente con los contratos y demuestra el flujo principal | ✅ | Simula y firma con wagmi (`frontend/src/lib/tx.jsx:24-27`): depositar, retirar y pedir (`frontend/src/components/Operate.jsx:42-44`), aprobar (`Requests.jsx:70`) y pausar (`Guardian.jsx:35`). Validado de punta a punta con Playwright contra la red local (`specs/001-frontend/tasks.md:21`) |
-| Demo con evidencia real on-chain | ⚠️ | La captura [`panel.png`](panel.png) muestra el panel conectado a Sepolia, leyendo el saldo real de la bóveda (9.240 mARS). Las transacciones on-chain registradas con hash salen de `scripts/interact.js`, no del panel. Faltan los hashes de operaciones hechas desde el panel en Sepolia (validación manual pendiente en la spec 001) |
+| Demo con evidencia real on-chain | ✅ | 6 operaciones hechas desde el panel en Sepolia firmando con MetaMask: dos retiros directos, un pedido de 500 aprobado por otra cuenta (doble firma) y un pedido de 500 rechazado por el guardián. Cada hash se verificó con la RPC pública el 2026-10-27 (destino la tesorería, método y remitente correctos, estado *success*): `README.md:205-216`. La captura [`panel.png`](panel.png) muestra el panel conectado a Sepolia |
 | Complejidad acorde al nivel avanzado | ✅ | Tres contratos con timelock, roles y doble firma; fuzzing con invariantes, PoCs y prueba de mutación; monitor con alertas; CI |
 | Se priorizó lo funcional antes que complejidad sin valor | ✅ | Panel sin backend ni librerías de gráficos (dependencias en `frontend/package.json`: react, wagmi, viem, react-query) |
 
@@ -82,15 +82,15 @@ La verificación del código fue **en modo lectura**: `contracts/` no se modific
 | `.env.example` | ✅ | `.env.example` |
 | Compila sin warnings relevantes sin analizar | ✅ | `npx hardhat compile --force`: 5 warnings, todos de `node_modules/@openzeppelin/contracts/utils/TransientSlot.sol` (uso de `tstore`). El mismo mensaje del compilador dice que usarlo para un guard de reentrancy que se limpia al terminar la llamada es seguro, y ese es el caso de `ReentrancyGuardTransient`. Contratos propios: 0 warnings |
 | README: qué hace y arquitectura | ✅ | `README.md:7` y `README.md:51` (diagrama Mermaid) |
-| README: cómo instalar y compilar | ✅ | `README.md:242-251` |
-| README: cómo correr tests y coverage | ✅ | `README.md:252-253` |
-| README: cómo correr Slither | ✅ | `README.md:256` |
-| README: cómo usarlo | ✅ | Panel web (`README.md:216`) y `npm run dev` (`README.md:296`); monitor (`README.md:232`) |
+| README: cómo instalar y compilar | ✅ | `README.md:255-264` |
+| README: cómo correr tests y coverage | ✅ | `README.md:265-266` |
+| README: cómo correr Slither | ✅ | `README.md:269` |
+| README: cómo usarlo | ✅ | Panel web (`README.md:229`) y `npm run dev` (`README.md:309`); monitor (`README.md:245`) |
 | README: red y direcciones | ✅ | `README.md:24-32` |
 | README: URL al código verificado | ✅ | `README.md:28-30` |
-| README: links o hashes de tx reales del flujo principal | ✅ | `README.md:185-203` |
+| README: links o hashes de tx reales del flujo principal | ✅ | `README.md:185-203` (script) y `README.md:205-216` (operaciones desde el panel) |
 | README: limitaciones conocidas del MVP | ✅ | `README.md:86` (Riesgos conocidos, con IDs y PoC) y [`auditoria.md`](auditoria.md) |
-| README: roadmap | ✅ | `README.md:313` |
+| README: roadmap | ✅ | `README.md:328` |
 
 ## G. Video
 
